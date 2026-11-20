@@ -895,7 +895,7 @@ document.addEventListener('click',e=>{const t=e.target;let b;
   if(b=t.closest('[data-book]')){vPlus();return}
   if(b=t.closest('[data-ss]')){S.st[stuK]=b.dataset.ss;save();$$('#stSeg button').forEach(x=>x.classList.toggle('on',x===b));{const sg=$('#stSeg');if(sg){sg.classList.remove('none');sg.dataset.i=Object.keys(ST).indexOf(S.st[stuK])}}const l=$('#stuList');if(l)l.innerHTML=stuRows();if(SOUND&&$('#ordWrap')){ordPartUi();ordSave()}return}
   $$('.stm.on').forEach(x=>x.classList.remove('on'))});
-const allStu=()=>{const m=new Map();S.stu.forEach(s=>m.set(key(s.name),s.name));S.ev.forEach(e=>{const k=key(e.person);if(k&&!m.has(k))m.set(k,e.person.trim())});return[...m]};
+const allStu=()=>{const m=new Map();S.stu.forEach(s=>m.set(key(s.name),s.name));S.ev.forEach(e=>{if(e.hh)return;const k=key(e.person);if(k&&!m.has(k))m.set(k,e.person.trim())});return[...m]};
 const subN=n=>String(n).replace('.',',');
 const fmtHM=m=>Math.floor(m/60)+' ч '+(m%60)+' мин';
 /* длина одного урока (мин): берётся из «Мои услуги» (поле «время в минутах» у услуги записи, иначе у основной услуги), по умолчанию 60 */
@@ -1225,7 +1225,7 @@ function anHtmlS(desk){
   const incM=sum(S.ord.filter(x=>x.date.startsWith(mkk)),pr),incP=sum(S.ord.filter(x=>x.date.startsWith(pkk)),pr);
   const ttl=an.per==='m'?MN[M]+' '+Y:an.per==='y'?String(Y):'Всё время';
   const all=S.ev,aInc=sum(S.ord,pr),aH=sum(all,hr);
-  const pm={};LO.forEach(x=>{const k=x.k;(pm[k]=pm[k]||{n:nmOf(k),c:0,h:0,m:0});pm[k].c++;pm[k].m+=pr(x)});
+  const pm={};LO.forEach(x=>{if(x.hh)return;const k=x.k;(pm[k]=pm[k]||{n:nmOf(k),c:0,h:0,m:0});pm[k].c++;pm[k].m+=pr(x)});
   L.forEach(e=>{const k=key(e.person);if(pm[k])pm[k].h+=hr(e)});
   const sv={};LO.forEach(x=>{const n=svc(x),k=n.toLowerCase();(sv[k]=sv[k]||{n,c:0,m:0});sv[k].c++;sv[k].m+=pr(x)});
   const svs=Object.values(sv).sort((a,b)=>b.m-a.m||b.c-a.c);
@@ -1297,7 +1297,7 @@ function anHtml(desk){
   else if(an.per==='y'){const v=Array(12).fill(0);L.forEach(e=>{v[+e.date.slice(5,7)-1]+=hr(e)*rt(e)});chart=bars(v,['Я','Ф','М','А','М','И','И','А','С','О','Н','Д'],rub);ct='Доход по месяцам'}
   else{const ys=[...new Set(S.ev.map(e=>e.date.slice(0,4)))].sort(),v=ys.map(y=>sum(S.ev.filter(e=>e.date.startsWith(y)),e=>hr(e)*rt(e)));chart=ys.length?bars(v,ys.map(y=>y.slice(2)),rub):'';ct='Доход по годам'}
   const byT=['lesson','rec'].map(t=>{const a=L.filter(e=>e.type===t);return `<div class="card" style="margin:0 0 10px"><div class="r"><b>${T[t].n}</b><span>${rub(sum(a,e=>hr(e)*rt(e)))}</span></div><div class="r"><span>${a.length} занятий</span><span>${H(sum(a,hr))}</span></div></div>`}).join('');
-  const pm={};L.forEach(e=>{const n=(e.person||'').trim();if(!n)return;(pm[n]=pm[n]||{c:0,h:0,m:0});pm[n].c+=evN(e);pm[n].h+=hr(e);pm[n].m+=hr(e)*rt(e)});
+  const pm={};L.forEach(e=>{const n=(e.person||'').trim();if(!n||e.hh)return;(pm[n]=pm[n]||{c:0,h:0,m:0});pm[n].c+=evN(e);pm[n].h+=hr(e);pm[n].m+=hr(e)*rt(e)});
   const top=Object.entries(pm).sort((a,b)=>b[1].m-a[1].m||b[1].h-a[1].h).slice(0,5).map(([n,o])=>`<div class="r"><span>${esc(n)} · ${o.c}</span><span>${rub(o.m)}</span></div>`).join('');
   const all=S.ev,aInc=sum(all,e=>hr(e)*rt(e)),aH=sum(all,hr);
   const ttl=an.per==='m'?MN[M]+' '+Y:an.per==='y'?String(Y):'Всё время';
@@ -1696,15 +1696,20 @@ function form(id,pre){
   $('#fSave').onclick=()=>{
     const n={id:id||String(Date.now()),type,person:$('#fPerson').value.trim(),date:dval,start:ts,end:te,note:$('#fNote').value.trim(),service:(!SOUND&&!id&&$('#fOrdS').value.trim())||undefined,pay:SOUND?undefined:pay,mark:SOUND?undefined:(id?e.mark:(xMark($('#fOrdS').value.trim())?'none':undefined)),price:pIn.value.trim()===''?(!SOUND&&!id&&pay!=='sub'&&basePrice()!=null?basePrice():undefined):Math.max(0,+pIn.value||0)};
     const er=t=>$('#fErr').textContent=t;
+    let hh=false;
+    if(id&&e&&e.hh){hh=true}
+    else if(SOUND&&!id){const fe0=xcFlush();if(fe0)return er(fe0);hh=!$('#fOrdS').value.trim()&&!$('#fOrdP').value.trim()&&!ordL.length&&xcL.length>0&&xcL.every(v=>v.h)}
+    else if(!SOUND&&!id){const sv1=key($('#fOrdS').value);hh=!!sv1&&(S.svcH||[]).some(x=>key(x.name)===sv1)}
+    if(hh){n.hh=1;if(!n.person)n.person=SOUND&&!id?xcL[0].name:(id?'Почасовая услуга':$('#fOrdS').value.trim())}
     if(!n.person)return er('Укажите имя');if(!n.date)return er('Укажите дату');if(!hs||!he)return er('Укажите время');if(n.end<=n.start)return er('Конец должен быть позже начала');
     const c=calAll().find(x=>x.id!==n.id&&x.date===n.date&&x.start<n.end&&n.start<x.end);
     if(c)return er(`Студия занята: ${c.person}, ${hm(c.start)}–${hm(c.end)}`);
-    if(pay==='sub'&&stat(key(n.person),n.id).left<=0)return er('В абонементе не осталось занятий');
+    if(!hh&&pay==='sub'&&stat(key(n.person),n.id).left<=0)return er('В абонементе не осталось занятий');
     if(SOUND&&!id){const fe=xcFlush();if(fe)return er(fe);const sv0=$('#fOrdS').value.trim(),pv0=$('#fOrdP').value.trim(),pd0=$('#fOrdPd').value.trim(),any=ordL.length||xcL.length;if(sv0||pv0){const pr0=+pv0||0;if(!sv0)return er('Укажите услугу');if(!(pr0>0))return er('Укажите стоимость')}if(fst==='part'&&(sv0||pv0||any)){const d0=+pd0||0,t0=netTot();if(!(d0>0))return er('Укажите, сколько внесено');if(d0>=t0)return er('Внесено должно быть меньше стоимости')}}
-    const wasNew=!S.stu.some(x=>key(x.name)===key(n.person));
+    const wasNew=!hh&&!S.stu.some(x=>key(x.name)===key(n.person));
     if(wasNew)S.stu.push({id:n.id,name:n.person});
-    if(!SOUND&&!id&&fstT)S.st[key(n.person)]=fst;
-    if(SOUND&&!id){const k=key(n.person),L=[],pct=disc(),len=n.end-n.start;
+    if(!hh&&!SOUND&&!id&&fstT)S.st[key(n.person)]=fst;
+    if(SOUND&&!id){const k=hh?'':key(n.person),L=[],pct=disc(),len=n.end-n.start;
       ordL.forEach(r=>L.push({s:r.s,p:r.p,hr:hrFlag(r.s,r.p,len)}));
       const sv=$('#fOrdS').value.trim(),pv=$('#fOrdP').value.trim();
       const xcN=xcL.filter(v=>!v.h),xcH=xcL.filter(v=>v.h);if(sv||pv||xcN.length){const pr=Math.max(0,+pv||0),xsm=xcN.reduce((a,v)=>a+v.price*v.q,0),xs=(S.svcX||[]).find(v=>key(v.name)===key(sv)),qn=xs&&!$('#fOrdXW').hidden?Math.min(999,Math.max(1,Math.round(+$('#fOrdQ').value)||1)):0,sp=[];if(sv)sp.push(qn>1?sv+' × '+qn:sv);xcN.forEach(v=>sp.push(v.q>1?v.name+' × '+v.q:v.name));L.push({s:sp.join(', '),p:pr+xsm,q:qn&&!xcN.length?qn:0,xs:xsm,hr:qn?0:hrFlag(sv,pr,len)})}
@@ -1712,8 +1717,8 @@ function form(id,pre){
       if(L.length){const gross=L.reduce((a,r)=>a+r.p,0),net=gross-Math.round(gross*pct/100);
         if(pct>0){let acc=0;L.forEach((r,i)=>{r.p=i<L.length-1?Math.round(r.p*(1-pct/100)):net-acc;acc+=r.p;r.hr=0;r.xs=0})}
         let left=fst==='part'?Math.max(0,+$('#fOrdPd').value||0):0,seq=0;
-        L.forEach(r=>{const o={id:String(Date.now()+1+seq++),k,service:r.s,price:r.p,date:n.date,evId:n.id,st:fst};if(r.q)o.q=r.q;if(r.hr)o.hr=r.hr;if(r.xs)o.xs=r.xs;if(pct>0)o.dc=pct;if(fst==='part'){const d=Math.min(left,o.price);o.paid=d;left-=d}S.ord.push(o)});
-        S.st[k]=fst;fixSt(k)}}
+        L.forEach(r=>{const o={id:String(Date.now()+1+seq++),k,service:r.s,price:r.p,date:n.date,evId:n.id,st:fst};if(hh)o.hh=1;if(r.q)o.q=r.q;if(r.hr)o.hr=r.hr;if(r.xs)o.xs=r.xs;if(pct>0)o.dc=pct;if(fst==='part'){const d=Math.min(left,o.price);o.paid=d;left-=d}S.ord.push(o)});
+        if(!hh){S.st[k]=fst;fixSt(k)}}}
     if(SOUND&&id)S.ord.forEach(o=>{if(o.evId===n.id&&o.hr>0){const np=Math.round(o.hr*(n.end-n.start)/60)+(o.xs||0);o.price=np;if(o.paid!=null)o.paid=Math.min(o.paid,np)}});
     S.ev=S.ev.filter(x=>x.id!==n.id);S.ev.push(n);save();cur=pd(n.date);closeAll();render();
   };
