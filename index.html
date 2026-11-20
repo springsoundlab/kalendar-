@@ -825,12 +825,12 @@ async function blockedScreen(user){
   ov.querySelector('#aBk').onclick=()=>location.reload();
 }
 /* панель администратора: коды доступа и удаление сотрудников */
-CL.adm={free:'',mode:'shared',used:{},cb:null,_u:null,_mk:0,
+CL.adm={free:'',mode:(()=>{try{return localStorage.getItem('ssl-adm-mode')==='solo'?'solo':'shared'}catch(e){return'shared'}})(),used:{},cb:null,_u:null,_mk:0,
   start(){
     if(this._u)return;const {F,db}=fb;
     this._u=F.onSnapshot(F.collection(db,'codes'),async s=>{
       let free='';const used={};
-      s.forEach(d=>{const x=d.data();if(x.used)used[d.id]={...x,code:d.id};else if(!free){free=d.id;this.mode=x.mode==='solo'?'solo':'shared'}});
+      s.forEach(d=>{const x=d.data();if(x.used)used[d.id]={...x,code:d.id};else if(!free){free=d.id;this.mode=x.mode==='solo'?'solo':'shared';try{localStorage.setItem('ssl-adm-mode',this.mode)}catch(e){}}});
       this.used=used;this.free=free;
       if(this.cb)this.cb();
       if(!free&&!this._mk){this._mk=1;try{await this.fresh()}catch(e){console.warn('codes',e)}this._mk=0}
@@ -844,7 +844,7 @@ CL.adm={free:'',mode:'shared',used:{},cb:null,_u:null,_mk:0,
     await b.commit();
   },
   async setMode(m){
-    m=m==='solo'?'solo':'shared';this.mode=m;
+    m=m==='solo'?'solo':'shared';this.mode=m;try{localStorage.setItem('ssl-adm-mode',m)}catch(e){}
     if(this.free)await fb.F.updateDoc(fb.F.doc(fb.db,'codes',this.free),{mode:m});
   },
   async remove(uid,code){
@@ -1540,19 +1540,21 @@ function fxCordPull(){fxCordLayout();fxCordAnim();S.fxO=!S.fxO;fxPartSet();fxCor
 function fxUi(){const sg=$('#fxSeg');if(!sg)return;$$('#fxSeg button').forEach(b=>b.classList.toggle('on',(b.dataset.fx==='1')===!!S.fx));sg.dataset.i=S.fx?1:0}
 function admBlk(){
   if(!IS_ADM)return '';
-  return `<div class="card debtc" id="admCard"><button type="button" class="dbh" id="admT" aria-expanded="false"><b>Коды доступа</b><span class="dbs" style="color:var(--tx2)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></button><div class="dbb" style="max-height:0px"><div id="admFree">…</div><label>Календарь для этого кода</label><div class="seg sx two" id="admMode" data-i="0" style="margin-top:8px;background:var(--bg)"><button type="button" data-cmode="shared" class="on">Общий</button><button type="button" data-cmode="solo">Индивидуальный</button></div><p style="color:var(--tx2);font-size:13px;margin:10px 0 0" id="admModeNote"></p><div class="row" style="margin-top:8px"><button class="btn g" data-codcopy style="margin:0;background:var(--bg);flex:1;font-size:15px">Копировать</button><button class="btn g" data-codnew style="margin:0;background:var(--bg);flex:1;font-size:15px">Обновить</button></div><p style="color:var(--tx2);font-size:13px;margin:10px 0 0">Код нужен только при регистрации. После неё он закрепляется за человеком, а здесь появляется новый.</p><div id="admList" style="margin-top:6px;padding-bottom:14px"></div></div></div>`;
+  const A0=CLOUD.adm,so0=A0.mode==='solo';
+  return `<div class="card debtc" id="admCard"><button type="button" class="dbh" id="admT" aria-expanded="false"><b>Коды доступа</b><span class="dbs" style="color:var(--tx2)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></button><div class="dbb" style="max-height:0px"><div id="admFree">${A0.free?A0.free.slice(0,4)+'-'+A0.free.slice(4):'…'}</div><label>Календарь для этого кода</label><div class="seg sx two" id="admMode" data-i="${so0?1:0}" style="margin-top:8px;background:var(--bg)"><button type="button" data-cmode="shared" class="${so0?'':'on'}">Общий</button><button type="button" data-cmode="solo" class="${so0?'on':''}">Индивидуальный</button></div><p style="color:var(--tx2);font-size:13px;line-height:1.4;margin:10px 0 0;min-height:38px" id="admModeNote">${so0?'Отдельный календарь и данные. Его записей не видит никто, включая вас.':'Человек в общем календаре: все видят занятость друг друга.'}</p><div class="row" style="margin-top:8px"><button class="btn g" data-codcopy style="margin:0;background:var(--bg);flex:1;font-size:15px">Копировать</button><button class="btn g" data-codnew style="margin:0;background:var(--bg);flex:1;font-size:15px">Обновить</button></div><p style="color:var(--tx2);font-size:13px;margin:10px 0 0">Код нужен только при регистрации. После неё он закрепляется за человеком, а здесь появляется новый.</p><div id="admList" style="margin-top:6px;padding-bottom:14px"></div></div></div>`;
 }
 function admRender(){
   const A=CLOUD.adm,f=$('#admFree'),l=$('#admList');if(!f||!l)return;
   f.textContent=A.free?A.free.slice(0,4)+'-'+A.free.slice(4):'…';
-  {const so=A.mode==='solo',g=$('#admMode');if(g){g.dataset.i=so?1:0;g.querySelectorAll('button').forEach(b=>b.classList.toggle('on',(b.dataset.cmode==='solo')===so))}const nt=$('#admModeNote');if(nt)nt.textContent=so?'Человек получит отдельный календарь и свои данные. Никто, включая вас, не увидит его записи в общем календаре.':'Человек будет в общем календаре студии: все видят занятость друг друга.'}
+  {const so=A.mode==='solo',g=$('#admMode');if(g){g.dataset.i=so?1:0;g.querySelectorAll('button').forEach(b=>b.classList.toggle('on',(b.dataset.cmode==='solo')===so))}const nt=$('#admModeNote');if(nt)nt.textContent=so?'Отдельный календарь и данные. Его записей не видит никто, включая вас.':'Человек в общем календаре: все видят занятость друг друга.'}
   const P=CLOUD.others||{},rows=[],seen=new Set();
   Object.values(A.used).sort((a,b)=>(a.usedAt&&a.usedAt.seconds||0)-(b.usedAt&&b.usedAt.seconds||0)).forEach(c=>{if(!c.uid||c.uid===ME.id)return;seen.add(c.uid);rows.push({u:c.uid,n:(P[c.uid]&&P[c.uid].name)||c.name||'Без имени',c:c.code,m:c.mode==='solo'})});
   Object.keys(P).forEach(u=>{if(!seen.has(u)&&u!==ME.id)rows.push({u,n:P[u].name||'Без имени',c:''})});
   l.innerHTML=rows.map(r=>`<div class="admr"><span class="admn">${esc(r.n)}${r.m?' <small style="color:var(--tx2)">· индивид.</small>':''}</span><span class="admc">${r.c?r.c.slice(0,4)+'-'+r.c.slice(4):'—'}</span><button class="sdel" data-coldel="${esc(r.u)}" data-code="${esc(r.c)}" data-nm="${esc(r.n)}" aria-label="Удалить аккаунт"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f04438" stroke-width="2.4" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div>`).join('');
-  fitSet();{const c=$('#admCard');if(c&&c.classList.contains('open'))c.querySelector('.dbb').style.maxHeight=c.querySelector('.dbb').scrollHeight+'px'}
+  fitSet();
 }
 function admInit(){if(!IS_ADM)return;CLOUD.adm.cb=admRender;CLOUD.adm.start();admRender()}
+if(IS_ADM){try{CLOUD.adm.cb=admRender;CLOUD.adm.start()}catch(e){console.warn(e)}}
 function extraSettings(){
   fullNext=true;
   sheet(`<button class="ib mbtn" data-menu aria-label="Меню"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><button class="xbtn" aria-label="Закрыть"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg></button><button class="hbtn" id="goMain" aria-label="Настройки" title="Настройки"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg><span>Настройки</span></button><h3 class="hx"><span class="hl">Дополнительные настройки</span><span class="hs">Доп. настройки</span></h3>
@@ -1576,7 +1578,7 @@ function settings(){
 let tallNext=false,fullNext=false,stuNext=false;
 const sheet=html=>{const sh=$('#sheet');sh.style.height='';$('#scrim').classList.toggle('blur',fullNext);$('#sheetBody').innerHTML=(tallNext?XB:'')+html;sh.style.transition='none';sh.classList.remove('an');sh.classList.toggle('tall',tallNext);sh.classList.toggle('full',fullNext);sh.classList.toggle('stu',stuNext);$('#scrim').classList.toggle('soft',stuNext);tallNext=fullNext=stuNext=false;void sh.offsetWidth;sh.style.transition='';void sh.offsetWidth;sh.classList.add('on');$('#scrim').classList.add('on')};
 let sd=null,sdn=null,setH=0;
-function fitSet(){const sh=$('#sheet');if(!sh.classList.contains('full')||!sh.querySelector('.setbar'))return;if(matchMedia('(max-width:899px)').matches){sh.style.height='';return}sh.style.height='auto';const nat=sh.scrollHeight;setH=Math.max(setH,nat);sh.style.height=Math.min(setH,innerHeight-24)+'px'}
+function fitSet(){const sh=$('#sheet');if(!sh.classList.contains('full')||!sh.querySelector('.setbar'))return;if(matchMedia('(max-width:899px)').matches){sh.style.height='';return}sh.style.height='auto';let nat=sh.scrollHeight;{const ac=$('#admCard');if(ac&&ac.classList.contains('open')){const bb=ac.querySelector('.dbb');nat-=bb.scrollHeight}}setH=Math.max(setH,nat);sh.style.height=Math.min(setH,innerHeight-24)+'px'}
 function sdRevert(){if(!sd)return;const d=sd;sd=null;sdn=null;S.name=d.name;S.theme=d.theme;S.fx=d.fx;S.fxS=d.fxS;S.fxP=d.fxP;S.fxO=d.fxO;fxApply();S.accent=d.accent;S.cs=d.cs;S.calColor=d.cal;_ca=null;applyTheme();render()}
 const closeAll=()=>{svcHide();detHide();sortHide();bdHide();if(sd)sdRevert();setH=0;document.body.classList.remove('dtop');$('#scrim').classList.remove('blur','soft');$('#sheet').classList.remove('on');$('#drawer').classList.remove('on');$('#scrim').classList.remove('on')};
 const openDrawer=()=>{const pp=$('#pplSheet');if(matchMedia('(max-width:899px)').matches&&($('#sheet').classList.contains('on')||(pp&&pp.classList.contains('on'))))document.body.classList.add('dtop');$('#drawer').classList.add('on');$('#scrim').classList.add('on')};
@@ -1810,7 +1812,7 @@ document.addEventListener('click',e=>{
   if(b=q('[data-so]')){S.stSort=b.dataset.so;save();sortUi();document.querySelectorAll('#stuList').forEach(l=>l.innerHTML=stuRows());return}
   if(q('[data-det]')){detShow();return}
   if(q('#detBack')){detHide();return}
-  if(q('#admT')){const c=$('#admCard'),b=c.querySelector('.dbb'),o=!c.classList.contains('open');c.classList.toggle('open',o);$('#admT').setAttribute('aria-expanded',o);b.style.maxHeight=b.scrollHeight+'px';if(!o){void b.offsetHeight;b.style.maxHeight='0px'}return}
+  if(q('#admT')){const c=$('#admCard'),b=c.querySelector('.dbb'),o=!c.classList.contains('open');c.classList.toggle('open',o);$('#admT').setAttribute('aria-expanded',o);clearTimeout(c._t);b.style.maxHeight=b.scrollHeight+'px';if(!o){void b.offsetHeight;b.style.maxHeight='0px'}else c._t=setTimeout(()=>{if(c.classList.contains('open'))b.style.maxHeight='none'},360);return}
   if(q('#detSave')){const ae=document.activeElement;if(ae&&ae.blur&&ae.closest&&ae.closest('#detPage'))ae.blur();save();detHide();toast('Сохранено');return}
   if(q('#bdBtn')){bdOpen('bd');return}if(q('#fdBtn')){bdOpen('fd');return}
   {const l=q('[data-dl]');if(l){const g=l.parentNode,v=l.dataset.dl,d=S.det[stuK]=S.det[stuK]||{};d.l=v;g.classList.remove('none');g.dataset.i=LV.indexOf(v);[...g.children].forEach(x=>x.classList.toggle('on',x===l));save();return}}
