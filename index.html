@@ -1527,7 +1527,7 @@ function fxCordPull(){fxCordLayout();fxCordAnim();S.fxO=!S.fxO;fxPartSet();fxCor
 function fxUi(){const sg=$('#fxSeg');if(!sg)return;$$('#fxSeg button').forEach(b=>b.classList.toggle('on',(b.dataset.fx==='1')===!!S.fx));sg.dataset.i=S.fx?1:0}
 function admBlk(){
   if(!IS_ADM)return '';
-  return `<div class="card" id="admCard"><label style="margin-top:0">Коды доступа</label><div id="admFree">…</div><div class="row" style="margin-top:8px"><button class="btn g" data-codcopy style="margin:0;background:var(--bg);flex:1;font-size:15px">Копировать</button><button class="btn g" data-codnew style="margin:0;background:var(--bg);flex:1;font-size:15px">Обновить</button></div><p style="color:var(--tx2);font-size:13px;margin:10px 0 0">Код нужен только при регистрации. После неё он закрепляется за человеком, а здесь появляется новый.</p><div id="admList" style="margin-top:6px"></div></div>`;
+  return `<div class="card debtc" id="admCard"><button type="button" class="dbh" id="admT" aria-expanded="false"><b>Коды доступа</b><span class="dbs" style="color:var(--tx2)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span></button><div class="dbb" style="max-height:0px"><div id="admFree">…</div><div class="row" style="margin-top:8px"><button class="btn g" data-codcopy style="margin:0;background:var(--bg);flex:1;font-size:15px">Копировать</button><button class="btn g" data-codnew style="margin:0;background:var(--bg);flex:1;font-size:15px">Обновить</button></div><p style="color:var(--tx2);font-size:13px;margin:10px 0 0">Код нужен только при регистрации. После неё он закрепляется за человеком, а здесь появляется новый.</p><div id="admList" style="margin-top:6px;padding-bottom:14px"></div></div></div>`;
 }
 function admRender(){
   const A=CLOUD.adm,f=$('#admFree'),l=$('#admList');if(!f||!l)return;
@@ -1536,7 +1536,7 @@ function admRender(){
   Object.values(A.used).sort((a,b)=>(a.usedAt&&a.usedAt.seconds||0)-(b.usedAt&&b.usedAt.seconds||0)).forEach(c=>{if(!c.uid||c.uid===ME.id)return;seen.add(c.uid);rows.push({u:c.uid,n:(P[c.uid]&&P[c.uid].name)||c.name||'Без имени',c:c.code})});
   Object.keys(P).forEach(u=>{if(!seen.has(u)&&u!==ME.id)rows.push({u,n:P[u].name||'Без имени',c:''})});
   l.innerHTML=rows.map(r=>`<div class="admr"><span class="admn">${esc(r.n)}</span><span class="admc">${r.c?r.c.slice(0,4)+'-'+r.c.slice(4):'—'}</span><button class="sdel" data-coldel="${esc(r.u)}" data-code="${esc(r.c)}" data-nm="${esc(r.n)}" aria-label="Удалить аккаунт"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f04438" stroke-width="2.4" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg></button></div>`).join('');
-  fitSet();
+  fitSet();{const c=$('#admCard');if(c&&c.classList.contains('open'))c.querySelector('.dbb').style.maxHeight=c.querySelector('.dbb').scrollHeight+'px'}
 }
 function admInit(){if(!IS_ADM)return;CLOUD.adm.cb=admRender;CLOUD.adm.start();admRender()}
 function extraSettings(){
@@ -1796,6 +1796,7 @@ document.addEventListener('click',e=>{
   if(b=q('[data-so]')){S.stSort=b.dataset.so;save();sortUi();document.querySelectorAll('#stuList').forEach(l=>l.innerHTML=stuRows());return}
   if(q('[data-det]')){detShow();return}
   if(q('#detBack')){detHide();return}
+  if(q('#admT')){const c=$('#admCard'),b=c.querySelector('.dbb'),o=!c.classList.contains('open');c.classList.toggle('open',o);$('#admT').setAttribute('aria-expanded',o);b.style.maxHeight=b.scrollHeight+'px';if(!o){void b.offsetHeight;b.style.maxHeight='0px'}return}
   if(q('#detSave')){const ae=document.activeElement;if(ae&&ae.blur&&ae.closest&&ae.closest('#detPage'))ae.blur();save();detHide();toast('Сохранено');return}
   if(q('#bdBtn')){bdOpen('bd');return}if(q('#fdBtn')){bdOpen('fd');return}
   {const l=q('[data-dl]');if(l){const g=l.parentNode,v=l.dataset.dl,d=S.det[stuK]=S.det[stuK]||{};d.l=v;g.classList.remove('none');g.dataset.i=LV.indexOf(v);[...g.children].forEach(x=>x.classList.toggle('on',x===l));save();return}}
