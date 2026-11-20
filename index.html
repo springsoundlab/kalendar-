@@ -141,6 +141,7 @@ body{padding-left:min(82vw,280px)}
 @media (min-width:900px){
 .sheet.full{top:50%;left:50%;right:auto;bottom:auto;width:min(520px,calc(100% - 48px));height:auto;max-height:calc(100% - 64px);border-radius:24px;padding:28px;transform:translate(-50%,-47%) scale(.97);opacity:0;pointer-events:none;transition:transform .25s cubic-bezier(.2,.8,.2,1),opacity .2s;box-shadow:var(--sh)}
 .sheet.full.on{transform:translate(-50%,-50%);opacity:1;pointer-events:auto}
+.hit{display:flex;justify-content:space-between;align-items:baseline;gap:12px;border:1px solid var(--ln);border-radius:10px;padding:8px 12px;margin-top:6px;font-size:14px}.hit span:first-child{min-width:0;overflow-wrap:anywhere}.hit span:last-child{white-space:nowrap;font-weight:600;margin-left:auto}
 .sheet.full.an{height:min(780px,calc(100% - 64px))}
 .sheet.full h3{padding-right:48px;min-height:36px;display:flex;align-items:center}
 .sheet.full .xbtn{display:grid;place-items:center;position:absolute;top:20px;right:20px;width:36px;height:36px;border-radius:50%;background:var(--bg2);z-index:2}
@@ -997,8 +998,9 @@ new MutationObserver(()=>{if($('#sheet').classList.contains('on'))return;if(fixA
 const ordKpH=o=>{const kp=(t,v)=>`<div class="card" style="margin:0"><small style="color:var(--tx2)">${t}</small><div class="big">${v}</div></div>`;return kp('Записей',o.n)+kp('Часов',+o.h.toFixed(1))+kp('Сумма заказов',rub(o.paid))+kp('Заказов',o.ord.length)};
 const ordSt=x=>{const p=+x.price||0;if(x.paid!=null)return(+x.paid||0)>=p?'paid':'part';if(x.st==='paid'||x.st==='unpaid')return x.st;return stOf(x.k)==='paid'?'paid':'unpaid'};
 const ordB=x=>{const p=+x.price||0;if(p>0&&ordSt(x)==='paid')return '<span style="white-space:nowrap;color:#2fb344;font-weight:600">'+rub(p)+'</span>';if(x.paid==null||p<=0)return rub(p);const d=p-(+x.paid||0);return '<span style="white-space:nowrap;color:var(--tx)">'+rub(p)+' <span style="color:var(--tx2)">/</span> <span style="color:#f04438;font-weight:600">'+rub(d)+'</span></span>'};
-const ordHistL=o=>{const used=new Set(),pr=new Map();o.ord.filter(x=>x.evId).forEach(x=>{const e=o.ev.find(v=>v.id===x.evId&&!used.has(v.id));if(e){used.add(e.id);pr.set(x.id,e)}});o.ord.filter(x=>!x.evId).forEach(x=>{const e=o.ev.find(v=>v.date===x.date&&!used.has(v.id));if(e){used.add(e.id);pr.set(x.id,e)}});const hist=[...o.ev.filter(e=>!used.has(e.id)).map(e=>({d:e.date,t:e.start,n:T[e.type].n,tm:hm(e.start)+'–'+hm(e.end)})),...o.ord.map(x=>{const e=pr.get(x.id);return e?{d:e.date,t:e.start,n:esc(x.service||'Заказ'),tm:hm(e.start)+'–'+hm(e.end),s:ordB(x),st:ordSt(x)}:{d:x.date,t:1e4,n:esc(x.service||'Заказ'),s:ordB(x),st:ordSt(x)}})].sort((a,b)=>b.d.localeCompare(a.d)||b.t-a.t);return hist};
-const ordHistC=h=>`<div class="card"><div class="r"><span>Дата</span><span>${dshort(h.d)}</span></div>${h.tm?`<div class="r"><span>Время</span><span>${h.tm}</span></div>`:''}<div class="r"><span>Услуга</span><span>${String(h.n).replace(/, /g,'<br>')}</span></div>${h.s?`<div class="r"><span>Сумма</span><span>${h.s}</span></div>`:''}${h.st==='unpaid'?`<div class="r"><span>Статус</span><span style="color:${ST[h.st].c};font-weight:600">${ST[h.st].n}</span></div>`:''}</div>`;
+const ordHistL=o=>{const used=new Set(),pr=new Map();o.ord.filter(x=>x.evId).forEach(x=>{const e=o.ev.find(v=>v.id===x.evId&&!used.has(v.id));if(e){used.add(e.id);pr.set(x.id,e)}});o.ord.filter(x=>!x.evId).forEach(x=>{const e=o.ev.find(v=>v.date===x.date&&!used.has(v.id));if(e){used.add(e.id);pr.set(x.id,e)}});const hist=[...o.ev.filter(e=>!used.has(e.id)).map(e=>({d:e.date,t:e.start,n:T[e.type].n,tm:hm(e.start)+'–'+hm(e.end)})),...o.ord.map(x=>{const e=pr.get(x.id);return e?{d:e.date,t:e.start,n:esc(x.service||'Заказ'),tm:hm(e.start)+'–'+hm(e.end),s:ordB(x),st:ordSt(x),it:x.it,pv:+x.price||0}:{d:x.date,t:1e4,n:esc(x.service||'Заказ'),s:ordB(x),st:ordSt(x),it:x.it,pv:+x.price||0}})].sort((a,b)=>b.d.localeCompare(a.d)||b.t-a.t);return hist};
+const itRows=h=>{const L=h.it&&h.it.length?h.it.map(i=>[esc(i.n),i.p]):String(h.n).split(', ').map(n=>[n,null]);if(!(h.it&&h.it.length)&&L.length===1&&h.pv>0)L[0][1]=h.pv;return L.map(r=>`<div class="hit"><span>${r[0]}</span>${r[1]!=null?`<span>${rub(r[1])}</span>`:''}</div>`).join('')};
+const ordHistC=h=>`<div class="card"><div class="r"><span>Дата</span><span>${dshort(h.d)}</span></div>${h.tm?`<div class="r"><span>Время</span><span>${h.tm}</span></div>`:''}<div class="r"><span>Услуга</span></div>${itRows(h)}${h.s?`<div class="r"><span>Сумма</span><span>${h.s}</span></div>`:''}${h.st==='unpaid'?`<div class="r"><span>Статус</span><span style="color:${ST[h.st].c};font-weight:600">${ST[h.st].n}</span></div>`:''}</div>`;
 const ordHistH=o=>{const hist=ordHistL(o);setTimeout(histFit,0);return '<div class="hhd'+(histOpen&&hist.length>1?' open':'')+'"><b>История</b>'+(hist.length>1?'<button class="hopen" data-histopen aria-label="Вся история"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>':'')+'</div>'+(hist.length?'<div class=\"hacc'+(histOpen&&hist.length>1?' open':'')+'\">'+hist.map(ordHistC).join('')+'</div>':'<div class=\"card\"><div class=\"r\"><span>Пока пусто</span></div></div>')};
 var histOpen=false;
 const vocHistC=e=>`<div class="card"><div class="r"><span>Дата</span><span>${dshort(e.date)}</span></div><div class="r"><span>Время</span><span>${hm(e.start)}–${hm(e.end)}</span></div><div class="r"><span>Занятие</span><span>${(e.service?esc(e.service):T[e.type].n).replace(/, /g,'<br>')}</span></div><div class="r"><span>Оплата</span><span>${e.pay==='sub'?'Абонемент':'Наличные'}</span></div>${e.price!=null&&e.price!==''?`<div class="r"><span>Сумма</span><span>${rub(e.price)}</span></div>`:''}</div>`;
@@ -1063,7 +1065,7 @@ document.addEventListener('mousedown',e=>{if(e.target.closest&&e.target.closest(
 const xLook=nm=>{const n=key(nm);return (S.svcX||[]).find(v=>key(v.name)===n)||(()=>{const h=(S.svcH||[]).find(v=>key(v.name)===n);return h?{...h,h:1}:null})()};
 const xLookId=id=>(S.svcX||[]).find(v=>v.id===id)||(()=>{const h=(S.svcH||[]).find(v=>v.id===id);return h?{...h,h:1}:null})();
 const hrFlag=(nm,pr,mins)=>{const h=(S.svcH||[]).find(x=>key(x.name)===key(nm));return h&&Math.round(h.price*mins/60)===pr?h.price:0};
-function ordCommit(){if(cxFlush())return null;const sv=$('#ordS').value.trim(),pv=$('#ordP').value.trim(),pr=Math.max(0,+pv||0),pdv=$('#ordPd').value.trim(),sst=stOf(stuK),xs=cxSum(),os=orSum(),pct=cDisc(),gross=pr+xs+os,tot=gross-Math.round(gross*pct/100),pd=sst==='part'?Math.min(Math.max(0,+pdv||0),tot):null,okk=((cxL.length||orL.length)?(!!sv===(pr>0)):(!!sv&&pr>0))&&(sst!=='part'||((+pdv||0)>0&&(+pdv||0)<tot));if(!okk)return null;const sp=[];orL.forEach(v=>sp.push(v.s));if(sv)sp.push(sv);cxL.forEach(v=>sp.push(v.q>1?v.name+' × '+v.q:v.name));const x={id:String(Date.now()),k:stuK,service:sp.join(', '),price:tot,date:iso(new Date()),st:sst};if(pd!=null)x.paid=pd;const hr=sv&&!pct?hrFlag(sv,pr,Math.round(oHrs()*60)):0;if(hr)x.hr=hr;if(xs&&!pct)x.xs=xs;if(pct>0)x.dc=pct;S.ord.push(x);ordId=x.id;return x}
+function ordCommit(){if(cxFlush())return null;const sv=$('#ordS').value.trim(),pv=$('#ordP').value.trim(),pr=Math.max(0,+pv||0),pdv=$('#ordPd').value.trim(),sst=stOf(stuK),xs=cxSum(),os=orSum(),pct=cDisc(),gross=pr+xs+os,tot=gross-Math.round(gross*pct/100),pd=sst==='part'?Math.min(Math.max(0,+pdv||0),tot):null,okk=((cxL.length||orL.length)?(!!sv===(pr>0)):(!!sv&&pr>0))&&(sst!=='part'||((+pdv||0)>0&&(+pdv||0)<tot));if(!okk)return null;const sp=[];orL.forEach(v=>sp.push(v.s));if(sv)sp.push(sv);cxL.forEach(v=>sp.push(v.q>1?v.name+' × '+v.q:v.name));const it=[];orL.forEach(v=>it.push({n:v.s,p:+v.p||0}));if(sv)it.push({n:sv,p:pr});cxL.forEach(v=>it.push({n:v.q>1?v.name+' × '+v.q:v.name,p:v.price*v.q}));const x={id:String(Date.now()),k:stuK,service:sp.join(', '),price:tot,date:iso(new Date()),st:sst};if(it.length>1||(it.length===1&&it[0].p>0))x.it=it;if(pd!=null)x.paid=pd;const hr=sv&&!pct?hrFlag(sv,pr,Math.round(oHrs()*60)):0;if(hr)x.hr=hr;if(xs&&!pct)x.xs=xs;if(pct>0)x.dc=pct;S.ord.push(x);ordId=x.id;return x}
 const oNew=()=>({sch:false,d:iso(new Date()),dm:new Date(),s:600,e:660,hs:false,he:false,act:null,bk:null});let oS={sch:false,d:'',dm:null,s:600,e:660,act:null,bk:null};
 const oDesk=()=>matchMedia('(min-width:900px)').matches;
 let oHAuto=false,oHBusy=false;
@@ -1254,7 +1256,7 @@ function anHtmlS(desk){
   const all=S.ev,aInc=sum(S.ord,pr),aH=sum(all,hr);
   const pm={};LO.forEach(x=>{if(x.hh)return;const k=x.k;(pm[k]=pm[k]||{n:nmOf(k),c:0,h:0,m:0});pm[k].c++;pm[k].m+=pr(x)});
   L.forEach(e=>{const k=key(e.person);if(pm[k])pm[k].h+=hr(e)});
-  const sv={};LO.forEach(x=>{const n=svc(x),k=n.toLowerCase();(sv[k]=sv[k]||{n,c:0,m:0});sv[k].c++;sv[k].m+=pr(x)});
+  const sv={};LO.forEach(x=>{if(x.it&&x.it.length){x.it.forEach(i=>{const n=String(i.n||'').trim()||'Без названия',k=n.toLowerCase();(sv[k]=sv[k]||{n,c:0,m:0});sv[k].c++;sv[k].m+=+i.p||0});return}const n=svc(x),k=n.toLowerCase();(sv[k]=sv[k]||{n,c:0,m:0});sv[k].c++;sv[k].m+=pr(x)});
   const svs=Object.values(sv).sort((a,b)=>b.m-a.m||b.c-a.c);
   const PAL=['var(--rec)','var(--les)','#2fb344','#a855f7'];
   const groups=svs.slice(0,4).map((o,i)=>({...o,col:PAL[i]}));
@@ -1739,17 +1741,20 @@ function form(id,pre){
     const wasNew=!hh&&!S.stu.some(x=>key(x.name)===key(n.person));
     if(wasNew)S.stu.push({id:n.id,name:n.person});
     if(!hh&&!SOUND&&!id&&fstT)S.st[key(n.person)]=fst;
-    if(SOUND&&!id){const k=hh?'':key(n.person),L=[],pct=disc(),len=n.end-n.start;
-      ordL.forEach(r=>L.push({s:r.s,p:r.p,hr:hrFlag(r.s,r.p,len)}));
+    if(SOUND&&!id){const k=hh?'':key(n.person),pct=disc(),len=n.end-n.start,it=[];let oq=0;
+      ordL.forEach(r=>{const hr=hrFlag(r.s,r.p,len);it.push(hr?{n:r.s,p:r.p,hr}:{n:r.s,p:r.p})});
       const sv=$('#fOrdS').value.trim(),pv=$('#fOrdP').value.trim();
-      const xcN=xcL.filter(v=>!v.h),xcH=xcL.filter(v=>v.h);if(sv||pv||xcN.length){const pr=Math.max(0,+pv||0),xsm=xcN.reduce((a,v)=>a+v.price*v.q,0),xs=(S.svcX||[]).find(v=>key(v.name)===key(sv)),qn=xs&&!$('#fOrdXW').hidden?Math.min(999,Math.max(1,Math.round(+$('#fOrdQ').value)||1)):0,sp=[];if(sv)sp.push(qn>1?sv+' × '+qn:sv);xcN.forEach(v=>sp.push(v.q>1?v.name+' × '+v.q:v.name));L.push({s:sp.join(', '),p:pr+xsm,q:qn&&!xcN.length?qn:0,xs:xsm,hr:qn?0:hrFlag(sv,pr,len)})}
-      xcH.forEach(v=>L.push({s:v.name,p:v.price,hr:Math.round(v.h*len/60)===v.price?v.h:0}));
-      if(L.length){const gross=L.reduce((a,r)=>a+r.p,0),net=gross-Math.round(gross*pct/100);
-        if(pct>0){let acc=0;L.forEach((r,i)=>{r.p=i<L.length-1?Math.round(r.p*(1-pct/100)):net-acc;acc+=r.p;r.hr=0;r.xs=0})}
-        let left=fst==='part'?Math.max(0,+$('#fOrdPd').value||0):0,seq=0;
-        L.forEach(r=>{const o={id:String(Date.now()+1+seq++),k,service:r.s,price:r.p,date:n.date,evId:n.id,st:fst};if(hh)o.hh=1;if(r.q)o.q=r.q;if(r.hr)o.hr=r.hr;if(r.xs)o.xs=r.xs;if(pct>0)o.dc=pct;if(fst==='part'){const d=Math.min(left,o.price);o.paid=d;left-=d}S.ord.push(o)});
+      const xcN=xcL.filter(v=>!v.h),xcH=xcL.filter(v=>v.h);
+      if(sv){const pr=Math.max(0,+pv||0),xsx=(S.svcX||[]).find(v=>key(v.name)===key(sv)),qn=xsx&&!$('#fOrdXW').hidden?Math.min(999,Math.max(1,Math.round(+$('#fOrdQ').value)||1)):0,hr=qn?0:hrFlag(sv,pr,len),row={n:qn>1?sv+' × '+qn:sv,p:pr};if(hr)row.hr=hr;it.push(row);oq=qn}
+      xcN.forEach(v=>it.push({n:v.q>1?v.name+' × '+v.q:v.name,p:v.price*v.q}));
+      xcH.forEach(v=>{const a=Math.round(v.h*len/60)===v.price;it.push(a?{n:v.name,p:v.price,hr:v.h}:{n:v.name,p:v.price})});
+      if(it.length){const gross=it.reduce((a,r)=>a+r.p,0),net=gross-Math.round(gross*pct/100);
+        const o={id:String(Date.now()+1),k,service:it.map(r=>r.n).join(', '),price:net,date:n.date,evId:n.id,st:fst,it};
+        if(hh)o.hh=1;if(oq&&it.length===1)o.q=oq;if(pct>0)o.dc=pct;
+        if(fst==='part')o.paid=Math.min(Math.max(0,+$('#fOrdPd').value||0),o.price);
+        S.ord.push(o);
         if(!hh){S.st[k]=fst;fixSt(k)}}}
-    if(SOUND&&id)S.ord.forEach(o=>{if(o.evId===n.id&&o.hr>0){const np=Math.round(o.hr*(n.end-n.start)/60)+(o.xs||0);o.price=np;if(o.paid!=null)o.paid=Math.min(o.paid,np)}});
+    if(SOUND&&id)S.ord.forEach(o=>{if(o.evId!==n.id)return;if(o.it&&o.it.some(r=>r.hr)){o.it.forEach(r=>{if(r.hr)r.p=Math.round(r.hr*(n.end-n.start)/60)});const g=o.it.reduce((a,r)=>a+r.p,0),np=g-Math.round(g*(o.dc||0)/100);o.price=np;if(o.paid!=null)o.paid=Math.min(o.paid,np)}else if(o.hr>0){const np=Math.round(o.hr*(n.end-n.start)/60)+(o.xs||0);o.price=np;if(o.paid!=null)o.paid=Math.min(o.paid,np)}});
     S.ev=S.ev.filter(x=>x.id!==n.id);S.ev.push(n);save();cur=pd(n.date);closeAll();render();
   };
 }
