@@ -557,7 +557,7 @@ const PUB=['type','person','date','start','end','note','service'];
 const CH=250000;
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-const ERR={'ssl/bad-code':'Неверный или уже использованный код доступа','ssl/need-code':'Введите код доступа от администратора','auth/invalid-credential':'Неверная почта или пароль','auth/wrong-password':'Неверная почта или пароль','auth/user-not-found':'Неверная почта или пароль','auth/invalid-email':'Введите корректную почту','auth/email-already-in-use':'Эта почта уже зарегистрирована — войдите','auth/weak-password':'Пароль — минимум 6 символов','auth/network-request-failed':'Нет соединения с интернетом','auth/too-many-requests':'Слишком много попыток — попробуйте позже','auth/operation-not-allowed':'В Firebase не включён вход по почте и паролю','auth/user-disabled':'Аккаунт отключён','permission-denied':'Нет доступа: проверьте правила Firestore'};
+const ERR={'ssl/email-taken':'Эта почта уже зарегистрирована. Если аккаунт удалён администратором, введите прежний пароль или нажмите «Забыли пароль»','ssl/bad-code':'Неверный или уже использованный код доступа','ssl/need-code':'Введите код доступа от администратора','auth/invalid-credential':'Неверная почта или пароль','auth/wrong-password':'Неверная почта или пароль','auth/user-not-found':'Неверная почта или пароль','auth/invalid-email':'Введите корректную почту','auth/email-already-in-use':'Эта почта уже зарегистрирована — войдите','auth/weak-password':'Пароль — минимум 6 символов','auth/network-request-failed':'Нет соединения с интернетом','auth/too-many-requests':'Слишком много попыток — попробуйте позже','auth/operation-not-allowed':'В Firebase не включён вход по почте и паролю','auth/user-disabled':'Аккаунт отключён','permission-denied':'Нет доступа: проверьте правила Firestore'};
 const emsg=e=>ERR[e&&e.code]||ERR[String(e&&e.code).replace('firestore/','')]||('Ошибка: '+((e&&e.message)||e));
 const ov=document.getElementById('auth')||(()=>{const d=document.createElement('div');d.id='auth';document.body.appendChild(d);return d})();
 const logo='<div class="alg"><i>♪</i>Студия</div>';
@@ -610,7 +610,19 @@ ${up?`<label>Имя</label><input id="aN" type="text" enterkeyhint="next" placeh
       else{
         let regSolo=false;
         try{localStorage.setItem('studio-pend',JSON.stringify({name:nm,role}))}catch(e){}
-        const c=await AU.createUserWithEmailAndPassword(auth,em,pw);
+        let c;
+        try{c=await AU.createUserWithEmailAndPassword(auth,em,pw)}
+        catch(x){
+          /* почта осталась в системе входа от удалённого администратором аккаунта: освобождаем её и регистрируем заново */
+          if(!x||x.code!=='auth/email-already-in-use'||em===ADMIN)throw x;
+          let old;try{old=await AU.signInWithEmailAndPassword(auth,em,pw)}catch(y){throw{code:'ssl/email-taken'}}
+          let bl=false;try{bl=(await F.getDoc(F.doc(db,'blocked',old.user.uid))).exists()}catch(y){}
+          if(!bl){try{await AU.signOut(auth)}catch(y){}throw x}
+          let okc=true;try{const cs=await F.getDoc(F.doc(db,'codes',cd));okc=cs.exists()&&!cs.data().used}catch(y){}
+          if(!okc){try{await AU.signOut(auth)}catch(y){}throw{code:'ssl/bad-code'}}
+          await old.user.delete();
+          c=await AU.createUserWithEmailAndPassword(auth,em,pw);
+        }
         if(em!==ADMIN){
           try{regSolo=await claimCode(c.user,cd,nm)}
           catch(x){
@@ -817,6 +829,8 @@ async function blockedScreen(user){
   CL.me=null;clearTimeout(CL._t);CL._t=0;
   try{if(CL._bw){CL._bw();CL._bw=null}}catch(e){}
   try{if(user)localStorage.removeItem('studio-crm-v1-'+user.uid)}catch(e){}
+  /* удалённый аккаунт освобождает почту: стираем и запись входа (это можно сделать только с устройства самого человека) */
+  try{if(user&&user.delete)await user.delete()}catch(e){}
   try{await fb.AU.signOut(fb.auth)}catch(e){}
   try{SPLASH.stop()}catch(e){}
   if(!ov.isConnected)document.body.appendChild(ov);
@@ -850,7 +864,7 @@ CL.adm={free:'',mode:(()=>{try{return localStorage.getItem('ssl-adm-mode')==='so
   async remove(uid,code){
     const {F,db}=fb,pr=CL._prof[uid]||{},c=this.used[code]||{};
     /* сначала блокировка — чтобы устройство сотрудника уже не смогло ничего записать */
-    await F.setDoc(F.doc(db,'blocked',uid),{name:String(pr.name||c.name||'').slice(0,40),email:String(pr.email||c.email||'').toLowerCase(),at:F.serverTimestamp()});
+    await F.setDoc(F.doc(db,'blocked',uid),{name:String(pr.name||c.name||'').slice(0,40),at:F.serverTimestamp()});
     for(const rt of ['users','solo'])for(const sub of ['private','events','sevents']){
       const sn=await F.getDocs(F.collection(db,rt,uid,sub));
       let b=F.writeBatch(db),n=0;
