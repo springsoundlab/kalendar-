@@ -419,7 +419,8 @@ input.xi,textarea.xi{padding-right:44px!important}
 .bdr{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--ln)}.bdr:first-child{border-top:0}.bdr .bn{flex:1;min-width:0}.bdr .bn b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bdr .bn small{color:var(--tx2)}.bdr .bd{flex:none;font-weight:600}.bdr.td .bd{color:var(--ac)}
 input#fOrdP.xi:placeholder-shown,input#ordP.xi:placeholder-shown{padding-right:10px!important}#fOrdP::placeholder,#ordP::placeholder{font-size:14px;text-overflow:clip}
 .hit{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:5px 0}.hit span:first-child{min-width:0;overflow-wrap:anywhere}.hit span:last-child{white-space:nowrap;margin-left:auto}
-.itr{display:flex;align-items:center;justify-content:space-between;gap:10px;width:calc(100% + 20px);text-align:left;background:color-mix(in srgb,var(--tx) 3.5%,transparent);border-radius:12px;padding:11px 10px;margin:6px -10px}.itr.open .dbs svg{transform:rotate(180deg)}.itw{display:none;margin:2px 0 8px;padding:0}.itw.open{display:block}
+.itr{display:flex;align-items:center;justify-content:space-between;gap:10px;width:calc(100% + 20px);text-align:left;background:none;border-radius:12px;padding:11px 10px;margin:6px -10px}.itr.open .dbs svg{transform:rotate(180deg)}.itw{display:none;margin:2px -10px 8px;padding:6px 10px;background:color-mix(in srgb,var(--tx) 5%,transparent);border-radius:12px}.itw.open{display:block}
+#sheet.nox,#sheet.nox *{transition:none!important;animation:none!important}
 </style>
 </head>
 <body>
@@ -1060,15 +1061,16 @@ const cxFit=()=>{const c=$('#cXc');if(c&&c.classList.contains('open')){const b=c
 function cxUi(){const x=cxF(),i=$('#cXcQi');if(!i)return;cxMode(x);const hx=!!(x&&x.h);qiSet(i,x&&!hx?'× '+rub(x.price)+' = '+rub(x.price*cxQn()):'',!!x&&!hx);cxRender();cxFit()}
 function cxTotUi(){const b=$('#cChk');if(!b)return;const g=cGross();b.style.display=g>0?'':'none';if(g<=0)return;cPcPos();const da=cDiscAmt(),net=g-da,pt=stOf(stuK)==='part';$('#cChM').textContent=rub(cMain());$('#cChX').textContent=rub(cxAll());$('#cChP1').style.display=pt?'flex':'none';$('#cChP2').style.display=pt?'flex':'none';$('#ordDebt').textContent=rub(Math.max(0,net-(+$('#ordPd').value||0)));$('#cTTotV').innerHTML=(da>0?'<s style="color:var(--tx2);font-weight:500">'+rub(g)+'</s>':'')+'<b>'+rub(net)+'</b>'}
 function cxRender(){const l=$('#cXcL');if(!l)return;l.innerHTML=cxL.map((v,i)=>`<div class="r" style="margin-top:10px;align-items:center"><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(v.name)}${v.q>1?' × '+v.q:''}</span><span class="sx2">${rub(v.price*v.q)}<button type="button" class="sdel" data-cxdel="${i}" aria-label="Удалить"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg></button></span></div>`).join('');$('#cXcSum').textContent='';cxTotUi()}
+const nox=f=>{const sh=document.getElementById('sheet');if(sh)sh.classList.add('nox');try{f()}finally{requestAnimationFrame(()=>requestAnimationFrame(()=>{if(sh)sh.classList.remove('nox')}))}};
 function orRender(){const l=$('#ordL');if(!l)return;l.innerHTML=orL.map((v,i)=>`<div class="r" style="margin-top:10px;align-items:center"><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(v.s)}</span><span class="sx2">${rub(v.p)}<button type="button" class="sdel" data-oldel="${i}" aria-label="Удалить"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg></button></span></div>`).join('');cxTotUi()}
 function cxSug(){const s=$('#cXcS'),g=$('#cXcSug');if(!s||!g)return;const q=key(s.value);cxUi();if(S.svcT&&!q){g.innerHTML='';g.classList.remove('on');cxFit();return}const m=[...(S.svcX||[]).map(v=>[v,0]),...(S.svcH||[]).map(v=>[v,1])].filter(a=>!q||key(a[0].name).startsWith(q)).filter(a=>key(a[0].name)!==q);g.innerHTML=m.map(a=>`<div data-cxs="${esc(a[0].id)}">${esc(a[0].name)}${a[1]?' <small style="color:var(--tx2)">· за 1 час</small>':''}</div>`).join('');g.classList.toggle('on',m.length>0);cxFit()}
 function cxReset(){cxL=[];orL=[];{const d=$('#cChD');if(d)d.value=''}orRender();const s=$('#cXcS');if(!s)return;s.value='';$('#cXcQ').value='';$('#cXcSug').classList.remove('on');cxUi();cxRender()}
 document.addEventListener('click',e=>{const t=e.target;if(!t.closest)return;
   if(t.closest('#ordAdd')){const sv=$('#ordS').value.trim(),pr=Math.max(0,+$('#ordP').value||0);if(!sv||!(pr>0)){toast('Укажите услугу и стоимость');return}orL.push({s:sv,p:pr});oHAuto=false;$('#ordS').value='';$('#ordP').value='';$('#ordP').dispatchEvent(new Event('input',{bubbles:true}));$('#ordS').dispatchEvent(new Event('input',{bubbles:true}));$('#ordSug').classList.remove('on');orRender();return}
-  {const od=t.closest('[data-oldel]');if(od){orL.splice(+od.dataset.oldel,1);orRender();return}}
+  {const od=t.closest('[data-oldel]');if(od){nox(()=>{orL.splice(+od.dataset.oldel,1);orRender()});return}}
   if(t.closest('#cXcT')){const c=$('#cXc'),b=c.querySelector('.dbb'),o=!c.classList.contains('open');c.classList.toggle('open',o);$('#cXcT').setAttribute('aria-expanded',o);if(o){b.style.maxHeight=b.scrollHeight+'px';if(matchMedia('(max-width:899px)').matches)scrollBottomGap(c,10,360);else dFitLive(c)}else{b.style.maxHeight=b.scrollHeight+'px';void b.offsetHeight;b.style.maxHeight='0px'}return}
   if(t.closest('#cXcAdd')){const x=cxF();if(!x){toast('Выберите доп. услугу из списка');return}if($('#cXcQ').value.trim()===''||(x.h&&!(+$('#cXcQ').value>0))){toast(x.h?'Укажите стоимость':'Укажите количество');return}$('#cXcSug').classList.remove('on');cxL.push(cxItem(x));$('#cXcS').value='';$('#cXcQ').value='';cxUi();cxFit();return}
-  const d=t.closest('[data-cxdel]');if(d){cxL.splice(+d.dataset.cxdel,1);cxRender();return}
+  const d=t.closest('[data-cxdel]');if(d){nox(()=>{cxL.splice(+d.dataset.cxdel,1);cxRender()});return}
   const s=t.closest('[data-cxs]');if(s){const x=xLookId(s.dataset.cxs);if(!x)return;$('#cXcS').value=x.name;$('#cXcSug').classList.remove('on');cxUi();cxFit()}
 });
 document.addEventListener('input',e=>{if(e.target.id==='cXcS')cxSug();if(e.target.id==='cXcQ'){if(cxM&&e.target.value.trim()!=='')cxRate=Math.max(0,+e.target.value||0)/oHrs();cxUi()}if(e.target.id==='ordP'||e.target.id==='ordS'||e.target.id==='cChD'||e.target.id==='ordPd')cxTotUi()});
@@ -1722,8 +1724,8 @@ function form(id,pre){
     xg.onclick=ev=>{const d=ev.target.closest('[data-xcs]');if(!d)return;const x=xLookId(d.dataset.xcs);if(!x)return;xs.value=x.name;xg.classList.remove('on');ui();fit()};
     xq.oninput=()=>{if(xm&&xq.value.trim()!=='')xRate=Math.max(0,+xq.value||0)/hrs();ui()};$('#fOrdP').addEventListener('input',tot);$('#fOrdS').addEventListener('input',tot);
     $('#fXcAdd').onclick=()=>{const x=xf();if(!x){toast('Выберите доп. услугу из списка');return}if(xq.value.trim()===''||(x.h&&!(+xq.value>0))){toast(x.h?'Укажите стоимость':'Укажите количество');return}xcL.push(xItem(x));xs.value='';xq.value='';xg.classList.remove('on');ui();fit()};
-    $('#fXcL').onclick=ev=>{const b=ev.target.closest('[data-xcdel]');if(!b)return;xcL.splice(+b.dataset.xcdel,1);rl();fit()};
-    $('#fOrdL').onclick=ev=>{const b=ev.target.closest('[data-oddel]');if(!b)return;ordL.splice(+b.dataset.oddel,1);rl()};
+    $('#fXcL').onclick=ev=>{const b=ev.target.closest('[data-xcdel]');if(!b)return;nox(()=>{xcL.splice(+b.dataset.xcdel,1);rl();fit()})};
+    $('#fOrdL').onclick=ev=>{const b=ev.target.closest('[data-oddel]');if(!b)return;nox(()=>{ordL.splice(+b.dataset.oddel,1);rl()})};
     $('#fOrdAdd').onclick=()=>{const sv=$('#fOrdS').value.trim(),pr=Math.max(0,+$('#fOrdP').value||0);if(!sv||!(pr>0)){toast('Укажите услугу и стоимость');return}ordL.push({s:sv,p:pr});$('#fOrdS').value='';$('#fOrdP').value='';$('#fOrdP').dispatchEvent(new Event('input',{bubbles:true}));$('#fOrdS').dispatchEvent(new Event('input',{bubbles:true}));$('#fOrdSug').classList.remove('on');rl()};
   }
   if(!SOUND&&!id){const si=$('#fOrdS'),sg2=$('#fOrdSug');
@@ -2389,7 +2391,7 @@ setTimeout(()=>{if(g.offsetParent)load3()},3000);
 </script>
 <script>
 /* версия и проверка обновлений: если на сервере лежит более новая версия, а телефон/компьютер показывает закэшированную, предлагаем обновиться */
-window.__BUILD='20261120.2360';window.__VER='1.0';
+window.__BUILD='20261121.0020';window.__VER='1.0';
 (function(){
  var BUILD=window.__BUILD,busy=false,last=0;
  function ban(){if(document.getElementById('updBar'))return;var d=document.createElement('div');d.id='updBar';
