@@ -424,6 +424,8 @@ input#fOrdP.xi:placeholder-shown,input#ordP.xi:placeholder-shown{padding-right:1
 #sheet.nox,#sheet.nox *{transition:none!important;animation:none!important}
 
 *{scrollbar-width:none!important;-ms-overflow-style:none!important}*::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
+
+.ghs .xclr{display:none!important}
 </style>
 </head>
 <body>
@@ -1615,6 +1617,17 @@ const sheet=html=>{const sh=$('#sheet');sh.style.height='';$('#scrim').classList
 let sd=null,sdn=null,setH=0;
 function fitSet(){const sh=$('#sheet');if(!sh.classList.contains('full')||!sh.querySelector('.setbar'))return;if(matchMedia('(max-width:899px)').matches){sh.style.height='';return}sh.style.height='auto';let nat=sh.scrollHeight;{const ac=$('#admCard');if(ac&&ac.classList.contains('open')){const bb=ac.querySelector('.dbb');nat-=bb.scrollHeight}}setH=Math.max(setH,nat);sh.style.height=Math.min(setH,innerHeight-24)+'px'}
 function sdRevert(){if(!sd)return;const d=sd;sd=null;sdn=null;S.name=d.name;S.theme=d.theme;S.fx=d.fx;S.fxS=d.fxS;S.fxP=d.fxP;S.fxO=d.fxO;fxApply();S.accent=d.accent;S.cs=d.cs;S.calColor=d.cal;_ca=null;applyTheme();render()}
+/* плавная смена содержимого окна: старое остаётся на месте, новое выезжает сбоку (dir 1 — справа, -1 — слева) */
+function slideSwap(run,dir,withId){const sh=$('#sheet'),ob=$('#sheetBody'),cs=getComputedStyle(sh),sl=sh.classList.contains('on'),gh=sl?ob.cloneNode(true):null;
+  if(gh){if(withId)gh.id='sheetBody';else gh.removeAttribute('id');gh.style.cssText='position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;box-sizing:border-box;padding:'+ob.offsetTop+'px '+cs.paddingRight+' '+cs.paddingBottom+' '+cs.paddingLeft+';pointer-events:none';gh.classList.add('ghs');sh.appendChild(gh);gh.querySelectorAll('*').forEach(e=>{if(!e.matches('.xbtn,.hbtn,.mbtn,.xbtn *,.hbtn *,.mbtn *')&&getComputedStyle(e).zIndex!=='auto')e.style.visibility='hidden'})}
+  run();if(!gh)return;
+  sh.scrollTop=0;const nb=$('#sheetBody'),ea='cubic-bezier(.2,.8,.2,1)',fx=dir<0?-1:1;
+  nb.style.position='relative';nb.style.zIndex='2';nb.style.background='var(--bg)';
+  const hid=[...nb.querySelectorAll('.xbtn,.hbtn,.mbtn')];hid.forEach(e=>e.style.visibility='hidden');
+  const mt=Math.max(0,parseFloat(getComputedStyle(nb.firstElementChild||nb).marginTop)||0)+'px',cv='0 -'+mt+' 0 0 var(--bg)',sx=fx*14;
+  const done=()=>{gh.remove();hid.forEach(e=>e.style.visibility='');nb.style.position=nb.style.zIndex=nb.style.background=''};
+  nb.animate([{transform:'translateX('+(fx>0?'calc(100% + 40px)':'calc(-100% - 40px)')+')',boxShadow:cv+','+(-sx)+'px 0 28px -10px rgba(0,0,0,.18)'},{transform:'none',boxShadow:cv+','+(-sx)+'px 0 28px -10px rgba(0,0,0,0)'}],{duration:300,easing:ea}).onfinish=done;
+  setTimeout(done,450)}
 const closeAll=()=>{svcHide();detHide();sortHide();bdHide();if(sd)sdRevert();setH=0;document.body.classList.remove('dtop');$('#scrim').classList.remove('blur','soft');$('#sheet').classList.remove('on');$('#drawer').classList.remove('on');$('#scrim').classList.remove('on')};
 const openDrawer=()=>{const pp=$('#pplSheet');if(matchMedia('(max-width:899px)').matches&&($('#sheet').classList.contains('on')||(pp&&pp.classList.contains('on'))))document.body.classList.add('dtop');$('#drawer').classList.add('on');$('#scrim').classList.add('on')};
 const closeDrawer=()=>{if(document.body.classList.contains('dtop')){document.body.classList.remove('dtop');$('#drawer').classList.remove('on')}else closeAll()};
@@ -1833,8 +1846,7 @@ document.addEventListener('click',e=>{
   if(b=q('[data-go]')){cur=pd(b.dataset.go);view='day';nd=1;first=true;return render()}
   if(b=q('.mc')){cur=pd(b.dataset.date);view='day';nd=1;first=true;return render()}
   if(b=q('[data-pay]')){const x=S.ev.find(v=>v.id===b.dataset.pay);x.paid=!x.paid;save();closeAll();render();return}
-  if(b=q('[data-edit]')){const sh=$('#sheet'),ob=$('#sheetBody'),cs=getComputedStyle(sh),sl=sh.classList.contains('on'),gh=sl?ob.cloneNode(true):null;if(gh){gh.removeAttribute('id');gh.style.cssText='position:absolute;top:0;left:0;right:0;bottom:0;display:flex;flex-direction:column;box-sizing:border-box;padding:'+ob.offsetTop+'px '+cs.paddingRight+' '+cs.paddingBottom+' '+cs.paddingLeft+';pointer-events:none;z-index:1';sh.appendChild(gh)}
-    form(b.dataset.edit);if(gh){sh.scrollTop=0;const nb=$('#sheetBody'),ea='cubic-bezier(.2,.8,.2,1)';nb.style.position='relative';nb.style.zIndex='2';nb.style.background='var(--bg)';const nx=nb.querySelector('.xbtn');if(nx)nx.style.visibility='hidden';const mt=Math.max(0,parseFloat(getComputedStyle(nb.firstElementChild||nb).marginTop)||0)+'px',cv='0 -'+mt+' 0 0 var(--bg)';nb.animate([{transform:'translateX(calc(100% + 40px))',boxShadow:cv+',-14px 0 28px -10px rgba(0,0,0,.18)'},{transform:'none',boxShadow:cv+',-14px 0 28px -10px rgba(0,0,0,0)'}],{duration:300,easing:ea}).onfinish=()=>{gh.remove();if(nx)nx.style.visibility='';nb.style.position=nb.style.zIndex=nb.style.background=''};setTimeout(()=>{gh.remove();if(nx)nx.style.visibility='';nb.style.position=nb.style.zIndex=nb.style.background=''},450)}return}
+  if(b=q('[data-edit]')){slideSwap(()=>form(b.dataset.edit),1,0);return}
   if(b=q('[data-del]')){const di=b.dataset.del;const ev0=S.ev.find(v=>v.id===di);cfmAsk('Удалить запись?','Запись будет удалена из календаря. Это действие нельзя отменить.',()=>{const ev1=S.ev.find(v=>v.id===di)||ev0;S.ev=S.ev.filter(v=>v.id!==di);/* вместе с записью уходят её услуги из истории клиента */{const e0=S.ev.find(v=>v.id===di)||ev0;/* старые заказы без привязки: пара по дате, как в истории */if(e0){const k=key(e0.person),rest=S.ev.filter(v=>key(v.person)===k),used=new Set();S.ord.forEach(x=>{if(x.k===k&&x.evId&&rest.some(v=>v.id===x.evId))used.add(x.evId)});const gone=new Set();S.ord.forEach(x=>{if(x.k===k&&!x.evId){const m=rest.find(v=>v.date===x.date&&!used.has(v.id));if(m)used.add(m.id);else if(x.date===e0.date)gone.add(x.id)}});S.ord=S.ord.filter(x=>!gone.has(x.id))}}S.ord=S.ord.filter(x=>x.evId!==di);save();closeAll();render();const l=$('#stuList');if(l)l.innerHTML=stuRows()});return}
   if(b=q('[data-d]')){cur=pd(b.dataset.d);return render()}
   if(b=q('[data-nav]')){cur=addD(cur,+b.dataset.nav);return render()}
@@ -1877,8 +1889,8 @@ document.addEventListener('click',e=>{
   if(b=q('[data-svdel]')){if(svcEd===b.dataset.svdel)svcEdEnd();S.svc=(S.svc||[]).filter(x=>x.id!==b.dataset.svdel);if(S.mainSvc===b.dataset.svdel)delete S.mainSvc;save();$('#svcList').innerHTML=svcRows();return}
   if(q('#svcAdd')&&svcKind==='h'){const nm=$('#svcName').value.trim(),pr=Math.max(0,+$('#svcPrice').value.trim()||0);if(!nm){toast('Укажите название услуги');return}if(!(pr>0)){toast('Укажите стоимость за 1 час');return}S.svcH=S.svcH||[];const dup=S.svcH.find(x=>x.id!==svcEd&&key(x.name)===key(nm));if(dup){toast('Услуга с таким названием уже есть');return}if(svcEd){const cur=S.svcH.find(x=>x.id===svcEd);if(cur){cur.name=nm;cur.price=pr}svcEdEnd();save();$('#svcHList').innerHTML=hRows();toast('Изменения сохранены');return}S.svcH.push({id:String(Date.now()),name:nm,price:pr});save();$('#svcHList').innerHTML=hRows();$('#svcName').value='';$('#svcPrice').value='';toast('Услуга сохранена');return}
   if(q('#svcAdd')){if(svcKind==='x'){const nm=$('#svcName').value.trim(),pr=Math.max(0,+$('#svcPrice').value.trim()||0),dv=($('#svcDur')||{value:''}).value.trim(),du=Math.round(+dv||0);if(!nm){toast('Укажите название услуги');return}if(!(pr>0)){toast('Укажите стоимость');return}if(dv!==''&&!(du>0&&du<=720)){toast('Время от 1 до 720 минут');return}S.svcX=S.svcX||[];if(svcEd){const cur=S.svcX.find(x=>x.id===svcEd),dup=S.svcX.find(x=>x.id!==svcEd&&key(x.name)===key(nm));if(dup){toast('Услуга с таким названием уже есть');return}if(cur){cur.name=nm;cur.price=pr;if(du>0)cur.dur=du;else delete cur.dur}svcEdEnd();save();$('#svcXList').innerHTML=xRows();toast('Изменения сохранены');return}const ex=S.svcX.find(x=>key(x.name)===key(nm));if(ex){ex.name=nm;ex.price=pr;if(du>0)ex.dur=du;else delete ex.dur}else S.svcX.push(du>0?{id:String(Date.now()),name:nm,price:pr,dur:du}:{id:String(Date.now()),name:nm,price:pr});save();$('#svcXList').innerHTML=xRows();$('#svcName').value='';$('#svcPrice').value='';if($('#svcDur'))$('#svcDur').value='';toast('Услуга сохранена');return}const nm=$('#svcName').value.trim(),pv=$('#svcPrice').value.trim(),pr=Math.max(0,+pv||0);if(!nm){toast('Укажите название услуги');return}if(!(pr>0)){toast('Укажите стоимость');return}const dr=$('#svcDur'),du=dr?Math.round(+dr.value||0):0;if(dr&&!(du>0&&du<=720)){toast('Укажите время в минутах');return}const uk=x=>key(x.name)+(dr?'|'+x.dur:'');S.svc=S.svc||[];if(svcEd){const cur=S.svc.find(x=>x.id===svcEd),dup=S.svc.find(x=>x.id!==svcEd&&uk(x)===key(nm)+(dr?'|'+du:''));if(dup){toast(dr?'Такая услуга уже есть':'Услуга с таким названием уже есть');return}if(cur){cur.name=nm;cur.price=pr;if(dr)cur.dur=du;svcMainApply(cur.id)}svcEdEnd();save();$('#svcList').innerHTML=svcRows();toast('Изменения сохранены');return}const ex=S.svc.find(x=>uk(x)===key(nm)+(dr?'|'+du:''));const sid=ex?ex.id:String(Date.now());if(ex){ex.name=nm;ex.price=pr}else S.svc.push(dr?{id:sid,name:nm,price:pr,dur:du}:{id:sid,name:nm,price:pr});svcMainApply(sid);save();$('#svcList').innerHTML=svcRows();$('#svcName').value='';$('#svcPrice').value='';if(dr)dr.value='';svcMainUi(!svcHasMain());toast('Услуга сохранена');return}
-  if(q('#goExtra')){const i=$('#setName');if(i)sdn=i.value;return extraSettings()}
-  if(q('#goMain')){return settings()}
+  if(q('#goExtra')){const i=$('#setName');if(i)sdn=i.value;slideSwap(()=>extraSettings(),1,1);return}
+  if(q('#goMain')){slideSwap(()=>settings(),-1,1);return}
   if(q('#setSave')){const i=$('#setName');S.name=(i?i.value:(sdn!=null?sdn:S.name)).trim();sd=null;sdn=null;save();accUpd();closeAll();render();return toast('Сохранено')}
   if(q('#setCancel')){closeAll();return}
   if(b=q('[data-cmode]')){CLOUD.adm.setMode(b.dataset.cmode).catch(x=>{console.error(x);toast('Не удалось — проверьте правила Firestore')});admRender();return}
@@ -2404,7 +2416,7 @@ setTimeout(()=>{if(g.offsetParent)load3()},3000);
 </script>
 <script>
 /* номер версии для «Дополнительных настроек» */
-window.__BUILD='20261121.1955';window.__VER='1.0';
+window.__BUILD='20261121.2015';window.__VER='1.0';
 </script>
 </body>
 </html>
