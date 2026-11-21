@@ -870,7 +870,7 @@ CL.adm={free:'',mode:(()=>{try{return localStorage.getItem('ssl-adm-mode')==='so
     const {F,db}=fb,pr=CL._prof[uid]||{},c=this.used[code]||{};
     /* сначала блокировка — чтобы устройство сотрудника уже не смогло ничего записать */
     await F.setDoc(F.doc(db,'blocked',uid),{name:String(pr.name||c.name||'').slice(0,40),at:F.serverTimestamp()});
-    for(const rt of ['users','solo'])for(const sub of ['private','events','sevents']){
+    for(const [rt,sub] of [['users','private'],['users','events'],['solo','private'],['solo','sevents']]){
       const sn=await F.getDocs(F.collection(db,rt,uid,sub));
       let b=F.writeBatch(db),n=0;
       for(const d of sn.docs){b.delete(d.ref);if(++n>=400){await b.commit();b=F.writeBatch(db);n=0}}
@@ -2403,7 +2403,7 @@ setTimeout(()=>{if(g.offsetParent)load3()},3000);
 </script>
 <script>
 /* номер версии для «Дополнительных настроек» */
-window.__BUILD='20261121.1400';window.__VER='1.0';
+window.__BUILD='20261121.1430';window.__VER='1.0';
 </script>
 </body>
 </html>
