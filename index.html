@@ -434,6 +434,7 @@ input#fOrdP.xi:placeholder-shown,input#ordP.xi:placeholder-shown{padding-right:1
 .adcg{background:color-mix(in srgb,var(--bg2) 93%,#000)!important;margin-top:8px!important;border-radius:14px}.acr{padding:7px 0!important}.adcb>div{padding-bottom:0}.adcg.open .adcb>div{padding-bottom:2px}.adcg .asv:last-child{margin-bottom:8px}
 .asv{background:color-mix(in srgb,var(--bg2),#fff 30%)!important}
 .adcg{background:var(--bg2)!important}.adcw{margin:2px 0 8px;padding:6px 10px;background:color-mix(in srgb,var(--tx) 5%,transparent);border-radius:12px}.asv{background:none!important;border-radius:0!important;padding:5px 0!important;margin:0!important}.adcg .asv:last-child{margin-bottom:0!important}.adsv0{padding:6px 0!important}
+.adr2{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch}.adr2>.adcd{display:flex;flex-direction:column;min-width:0}.adr2 .adall{margin-top:auto}.ad{padding-bottom:56px}.adnote{position:fixed;left:296px;right:16px;bottom:19px;margin:0;text-align:left;pointer-events:none;z-index:2}
 </style>
 </head>
 <body>
@@ -1327,7 +1328,7 @@ function anHtmlS(desk){
     const hid=an.per==='all'?' style="visibility:hidden" tabindex="-1"':'';
     return `<div class="ad"><div class="adh"><div><h2>Аналитика</h2></div><div class="adn"><div class="adnv"><button class="ib" data-ao="-1" aria-label="Назад"${hid}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block;pointer-events:none"><path d="M15 6l-6 6 6 6"/></svg></button><b>${ttl}</b><button class="ib" data-ao="1" aria-label="Вперёд"${hid}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block;pointer-events:none"><path d="M9 6l6 6-6 6"/></svg></button></div><div class="seg sx" data-i="${an.per==='y'?0:an.per==='m'?1:2}"><button class="${an.per==='y'?'on':''}" data-ap="y">Год</button><button class="${an.per==='m'?'on':''}" data-ap="m">Месяц</button><button class="${an.per==='all'?'on':''}" data-ap="all">Всё время</button></div></div></div>
     <div class="adk">${kp(incT,rub(incM),!incP?'<span class=\"adt\">нет данных для сравнения</span>':(()=>{const x=Math.round((incM-incP)/incP*100),up=x>=0;return `<span class=\"adt ${up?'up':'dn'}\">${up?'↑':'↓'} ${Math.abs(x)}%</span><span class=\"adt\">${incV}</span>`})())}${kp('Заказов',cnt,dl(cnt,pc))}${kp('Часов',H(hrs),dl(hrs,ph))}${kp('Средний чек',rub(avg),dl(avg,pc?pi/pc:0))}</div>
-    <div class="adg"><div class="adcol">${chart}</div><div class="adcol">${struct}${week}${allc}</div></div>
+    <div class="adg"><div class="adcol">${chart}<div class="adr2">${week}${allc}</div></div><div class="adcol">${struct}</div></div>
     <p class="adnote">Доход считается по всем услугам в заказах: основным, дополнительным и почасовым — по их цене с учётом скидок.</p></div>`;
   }
   const kpi=(t,v)=>`<div class="card" style="margin:0"><small style="color:var(--tx2)">${t}</small><div class="big">${v}</div></div>`;
@@ -1395,7 +1396,7 @@ function anHtml(desk){
     const hid=an.per==='all'?' style="visibility:hidden" tabindex="-1"':'';
     return `<div class="ad"><div class="adh"><div><h2>Аналитика</h2></div><div class="adn"><div class="adnv"><button class="ib" data-ao="-1" aria-label="Назад"${hid}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block;pointer-events:none"><path d="M15 6l-6 6 6 6"/></svg></button><b>${ttl}</b><button class="ib" data-ao="1" aria-label="Вперёд"${hid}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block;pointer-events:none"><path d="M9 6l6 6-6 6"/></svg></button></div><div class="seg sx" data-i="${an.per==='y'?0:an.per==='m'?1:2}"><button class="${an.per==='y'?'on':''}" data-ap="y">Год</button><button class="${an.per==='m'?'on':''}" data-ap="m">Месяц</button><button class="${an.per==='all'?'on':''}" data-ap="all">Всё время</button></div></div></div>
     <div class="adk">${kp(incT,rub(incM),!incP?'<span class=\"adt\">нет данных для сравнения</span>':(()=>{const x=Math.round((incM-incP)/incP*100),up=x>=0;return `<span class=\"adt ${up?'up':'dn'}\">${up?'↑':'↓'} ${Math.abs(x)}%</span><span class=\"adt\">${incV}</span>`})())}${kp('Занятий',subN(cnt),dl(cnt,pc))}${kp('Часов',H(hrs),dl(hrs,ph))}${kp('Средний чек',rub(avg),dl(avg,pc?pi/pc:0))}</div>
-    <div class="adg"><div class="adcol">${chart}</div><div class="adcol">${struct}${week}${allc}</div></div>
+    <div class="adg"><div class="adcol">${chart}<div class="adr2">${week}${allc}</div></div><div class="adcol">${struct}</div></div>
     ${rateNote()?`<p class="adnote">${rateNote()}</p>`:''}</div>`;
   }
   return `<button class="ib mbtn" data-menu aria-label="Меню"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><button class="xbtn" aria-label="Закрыть"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg></button>`+`<h3 style="text-transform:capitalize">Аналитика</h3>
@@ -2566,7 +2567,7 @@ setTimeout(()=>{if(g.offsetParent)load3()},3000);
 /* номер версии для «Дополнительных настроек» */
 
 
-window.__BUILD='20261122.0235';window.__VER='1.0';
+window.__BUILD='20261122.0240';window.__VER='1.0';
 </script>
 </body>
 </html>
