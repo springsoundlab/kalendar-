@@ -918,6 +918,7 @@ const calAll=()=>{if(_ca)return _ca;const r=S.ev.map(e=>({...e,own:1,owner:S.nam
   oth().forEach(u=>(u.ev||[]).forEach(e=>r.push({...e,id:u.id+':'+e.id,own:0,owner:u.name,role:u.role,col:colOf(u,u)})));return _ca=r};
 window.__cloudChange=()=>{_ca=null;render()};
 const key=n=>String(n||'').trim().toLowerCase();
+const rateNote=()=>{const m=(S.svc||[]).find(x=>x.id===S.mainSvc),b=basePrice();return b&&m?`Доход считается по ставке — ${esc(m.name)} ${rub(b)}. Доп. и почасовые услуги — по их цене.`:''};
 const basePrice=()=>{if(!SOUND){const m=(S.svc||[]).find(x=>x.id===S.mainSvc);if(m&&+m.price>0)return+m.price}return S.price!=null&&+S.price>0?+S.price:null};
 /* Статусы учеников */
 S.st=S.st||{};let stuF='all';
@@ -949,7 +950,7 @@ const evN=e=>e&&e.type==='rec'?1:subLsn(e);
 function subLsn(e){return Math.max(1,Math.round((e.end-e.start)/lsnLen(e)*2)/2)}
 function subUnit(k,ex){const su=S.subs.filter(x=>x.k===k).sort((a,b)=>(a.date+a.id).localeCompare(b.date+b.id));let used=S.ev.filter(e=>key(e.person)===k&&e.pay==='sub'&&e.id!==ex).reduce((a,e)=>a+subLsn(e),0);for(const x of su){if(used<x.total)return x.unit||(x.price/x.total)||0;used-=x.total}return null}
 function stat(k,ex){if(SOUND){const hr=e=>(e.end-e.start)/60,ev=S.ev.filter(e=>key(e.person)===k),od=S.ord.filter(x=>x.k===k).sort((a,b)=>(a.date+a.id).localeCompare(b.date+b.id));return{ev,su:[],ord:od,total:0,left:0,n:ev.length,h:ev.reduce((a,e)=>a+hr(e),0),paid:od.reduce((a,x)=>a+(+x.price||0),0),debt:od.reduce((a,x)=>a+(x.paid!=null?Math.max(0,(+x.price||0)-(+x.paid||0)):(ordSt(x)==='unpaid'?Math.max(0,+x.price||0):0)),0),pd:od.reduce((a,x)=>a+(x.paid!=null?Math.max(0,(+x.price||0)-(+x.paid||0)):0),0),last:[...ev.map(e=>e.date),...od.map(x=>x.date)].reduce((a,d)=>d&&d>a?d:a,''),lastSvc:od.length?od[od.length-1].service:''}}const hr=e=>(e.end-e.start)/60,ev=S.ev.filter(e=>key(e.person)===k),su=S.subs.filter(x=>x.k===k),total=su.reduce((a,x)=>a+x.total,0),used=ev.filter(e=>e.pay==='sub'&&e.id!==ex).reduce((a,e)=>a+subLsn(e),0);
-  return{ev,su,total,left:total-used,n:ev.reduce((a,e)=>a+evN(e),0),h:ev.reduce((a,e)=>a+hr(e),0),paid:su.reduce((a,x)=>a+x.price,0)+ev.filter(e=>e.pay!=='sub').reduce((a,e)=>a+(e.price!=null&&e.price!==''?+e.price||0:hr(e)*(+S.rate[e.type]||0)),0),last:ev.reduce((a,e)=>e.date>a?e.date:a,'')}}
+  return{ev,su,total,left:total-used,n:ev.reduce((a,e)=>a+evN(e),0),h:ev.reduce((a,e)=>a+hr(e),0),paid:su.reduce((a,x)=>a+x.price,0)+ev.filter(e=>e.pay!=='sub').reduce((a,e)=>a+(e.price!=null&&e.price!==''?+e.price||0:(basePrice()||0)),0),last:ev.reduce((a,e)=>e.date>a?e.date:a,'')}}
 const subCell=o=>SOUND?`<small>${o.lastSvc?esc(o.lastSvc):'Нет заказов'}</small>`:o.total?(o.left>0?`<small>Осталось ${subN(o.left)} из ${o.total}</small>`:'<small>Абонемент закончился</small>'):'<small>Нет абонемента</small>';
 const dshort=d=>pd(d).toLocaleDateString('ru-RU',{day:'numeric',month:'short'});
 function stuCap(){const l=$('#stuList');if(!l)return;l.style.maxHeight='';l.style.overflowY='';l.style.overscrollBehavior='';const pg=l.closest('.pg');if(pg)pg.style.paddingBottom='';const r=l.querySelector('.srow'),lb=l.getBoundingClientRect();if(!r||lb.height<=0)return;const rh=r.getBoundingClientRect().height,mn=pg?$('#main'):null,bt=mn?mn.getBoundingClientRect().bottom:window.innerHeight,gap=pg?16:20,av=Math.max(bt-lb.top-gap,rh*3);if(pg)pg.style.paddingBottom=gap+'px';l.style.maxHeight='calc('+av+'px - env(safe-area-inset-bottom,0px))';l.style.overflowY='auto';l.style.overscrollBehavior='contain'}
@@ -1329,7 +1330,7 @@ function anHtmlS(desk){
     return `<div class="ad"><div class="adh"><div><h2>Аналитика</h2></div><div class="adn"><div class="adnv"><button class="ib" data-ao="-1" aria-label="Назад"${hid}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block;pointer-events:none"><path d="M15 6l-6 6 6 6"/></svg></button><b>${ttl}</b><button class="ib" data-ao="1" aria-label="Вперёд"${hid}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block;pointer-events:none"><path d="M9 6l6 6-6 6"/></svg></button></div><div class="seg sx" data-i="${an.per==='y'?0:an.per==='m'?1:2}"><button class="${an.per==='y'?'on':''}" data-ap="y">Год</button><button class="${an.per==='m'?'on':''}" data-ap="m">Месяц</button><button class="${an.per==='all'?'on':''}" data-ap="all">Всё время</button></div></div></div>
     <div class="adk">${kp(incT,rub(incM),!incP?'<span class=\"adt\">нет данных для сравнения</span>':(()=>{const x=Math.round((incM-incP)/incP*100),up=x>=0;return `<span class=\"adt ${up?'up':'dn'}\">${up?'↑':'↓'} ${Math.abs(x)}%</span><span class=\"adt\">${incV}</span>`})())}${kp('Заказов',cnt,dl(cnt,pc))}${kp('Часов',H(hrs),dl(hrs,ph))}${kp('Средний чек',rub(avg),dl(avg,pc?pi/pc:0))}</div>
     <div class="adg"><div class="adcol">${chart}${tops}</div><div class="adcol">${struct}${week}${allc}</div></div>
-    <p class="adnote">Доход считается по заказам: сумма стоимости заказов, которые вы вносите в карточках клиентов.</p></div>`;
+    <p class="adnote">Доход считается по всем услугам в заказах: основным, дополнительным и почасовым — по их цене с учётом скидок.</p></div>`;
   }
   const kpi=(t,v)=>`<div class="card" style="margin:0"><small style="color:var(--tx2)">${t}</small><div class="big">${v}</div></div>`;
   const bars=(v,lb,fm)=>{const mx=Math.max(...v,0)||1;return `<div class="bars">${v.map((x,k)=>`<div class="bc" title="${fm(x)}"><i style="height:${x/mx*100}%;${x?'':'opacity:.25'}"></i><small>${lb[k]}</small></div>`).join('')}</div>`};
@@ -1347,11 +1348,11 @@ function anHtmlS(desk){
   ${chart?`<div class="card" style="margin:0 0 10px"><small style="color:var(--tx2)">${ct}</small>${chart}</div>`:''}
   ${top?`<div class="card" style="margin:0 0 10px"><b>Топ имён</b>${top}</div>`:''}
   <div class="card" style="margin:0 0 10px"><div class="r"><b>За всё время</b><span>${rub(aInc)}</span></div><div class="r"><span>${S.ord.length} заказов</span><span>${H(aH)}</span></div></div>
-  <p style="color:var(--tx2);font-size:13px;margin:0">Доход считается по заказам: сумма стоимости заказов из карточек клиентов.</p>`;
+  <p style="color:var(--tx2);font-size:13px;margin:0">Доход считается по всем услугам в заказах: основным, дополнительным и почасовым — по их цене с учётом скидок.</p>`;
 }
 function anHtml(desk){
   if(SOUND)return anHtmlS(desk);
-  const hr=e=>(e.end-e.start)/60,rt=e=>(e.price!=null&&e.price!==''&&hr(e)>0)?(+e.price||0)/hr(e):(+(S.rate&&S.rate[e.type])||0);
+  const hr=e=>(e.end-e.start)/60,rt=e=>(e.price!=null&&e.price!==''&&hr(e)>0)?(+e.price||0)/hr(e):(hr(e)>0?(basePrice()||0)/hr(e):0);
   const Y=an.y,M=an.m,mk=Y+'-'+pad(M+1);
   const inP=e=>an.per==='all'||(an.per==='y'?e.date.startsWith(Y+'-'):e.date.startsWith(mk));
   const L=S.ev.filter(inP);
@@ -1402,7 +1403,7 @@ function anHtml(desk){
     return `<div class="ad"><div class="adh"><div><h2>Аналитика</h2></div><div class="adn"><div class="adnv"><button class="ib" data-ao="-1" aria-label="Назад"${hid}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block;pointer-events:none"><path d="M15 6l-6 6 6 6"/></svg></button><b>${ttl}</b><button class="ib" data-ao="1" aria-label="Вперёд"${hid}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block;pointer-events:none"><path d="M9 6l6 6-6 6"/></svg></button></div><div class="seg sx" data-i="${an.per==='y'?0:an.per==='m'?1:2}"><button class="${an.per==='y'?'on':''}" data-ap="y">Год</button><button class="${an.per==='m'?'on':''}" data-ap="m">Месяц</button><button class="${an.per==='all'?'on':''}" data-ap="all">Всё время</button></div></div></div>
     <div class="adk">${kp(incT,rub(incM),!incP?'<span class=\"adt\">нет данных для сравнения</span>':(()=>{const x=Math.round((incM-incP)/incP*100),up=x>=0;return `<span class=\"adt ${up?'up':'dn'}\">${up?'↑':'↓'} ${Math.abs(x)}%</span><span class=\"adt\">${incV}</span>`})())}${kp('Занятий',subN(cnt),dl(cnt,pc))}${kp('Часов',H(hrs),dl(hrs,ph))}${kp('Средний чек',rub(avg),dl(avg,pc?pi/pc:0))}</div>
     <div class="adg"><div class="adcol">${chart}${tops}</div><div class="adcol">${struct}${week}${allc}</div></div>
-    <p class="adnote">Доход считается по ставкам: урок ${rub(+(S.rate&&S.rate.lesson)||0)}/ч, запись ${rub(+(S.rate&&S.rate.rec)||0)}/ч — либо по цене, указанной в записи.</p></div>`;
+    ${rateNote()?`<p class="adnote">${rateNote()}</p>`:''}</div>`;
   }
   return `<button class="ib mbtn" data-menu aria-label="Меню"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><button class="xbtn" aria-label="Закрыть"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg></button>`+`<h3 style="text-transform:capitalize">Аналитика</h3>
   <div class="seg sx" data-i="${an.per==='y'?0:an.per==='m'?1:2}" style="margin-bottom:12px"><button class="${an.per==='y'?'on':''}" data-ap="y">Год</button><button class="${an.per==='m'?'on':''}" data-ap="m">Месяц</button><button class="${an.per==='all'?'on':''}" data-ap="all">Всё время</button></div>
@@ -1412,7 +1413,7 @@ function anHtml(desk){
   ${chart?`<div class="card" style="margin:0 0 10px"><small style="color:var(--tx2)">${ct}</small>${chart}</div>`:''}
   ${top?`<div class="card" style="margin:0 0 10px"><b>Топ имён</b>${top}</div>`:''}
   <div class="card" style="margin:0 0 10px"><div class="r"><b>За всё время</b><span>${rub(aInc)}</span></div><div class="r"><span>${all.length} занятий</span><span>${H(aH)}</span></div></div>
-  <p style="color:var(--tx2);font-size:13px;margin:0">Доход считается по ставкам: урок ${rub(+(S.rate&&S.rate.lesson)||0)}/ч, запись ${rub(+(S.rate&&S.rate.rec)||0)}/ч.</p>`;
+  ${rateNote()?`<p style="color:var(--tx2);font-size:13px;margin:0">${rateNote()}</p>`:''}`;
 }
 function analytics(){const d=new Date();an={per:'m',y:d.getFullYear(),m:d.getMonth()};fullNext=true;sheet(anHtml());$('#sheet').classList.add('an')}
 const anUp=()=>page==='rep'?pages():($('#sheetBody').innerHTML=anHtml());
@@ -2573,7 +2574,7 @@ setTimeout(()=>{if(g.offsetParent)load3()},3000);
 /* номер версии для «Дополнительных настроек» */
 
 
-window.__BUILD='20261122.0210';window.__VER='1.0';
+window.__BUILD='20261122.0225';window.__VER='1.0';
 </script>
 </body>
 </html>
