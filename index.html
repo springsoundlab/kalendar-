@@ -427,7 +427,10 @@ input#fOrdP.xi:placeholder-shown,input#ordP.xi:placeholder-shown{padding-right:1
 
 .ghs .xclr{display:none!important}
 .adcat{cursor:pointer;-webkit-user-select:none;user-select:none}.adcat .adch{flex:none;margin-left:8px;color:var(--tx2);transition:transform .25s}.adcg.open .adch{transform:rotate(180deg)}.adcb{display:grid;grid-template-rows:0fr;transition:grid-template-rows .28s ease}.adcg.open .adcb{grid-template-rows:1fr}.adcb>div{overflow:hidden;min-height:0}.adsv{padding-left:22px}.adsv .nm b{font-weight:600}.adsv0{padding:8px 0 8px 22px;color:var(--tx2);font-size:13px}
-.adcg{border:1.5px solid var(--ln);border-radius:16px;padding:0 14px;margin-top:10px}.adcg>.adr{border-top:0!important;padding-top:12px;padding-bottom:12px}.adcg .adcb .adr:first-child{border-top:1px solid var(--ln)!important}.adcg .adr:last-child{padding-bottom:12px}
+.adcg{border:1.5px solid var(--ln);border-radius:16px;padding:0 14px;margin-top:10px}
+.acr,.asv{display:flex;align-items:center;gap:8px;min-width:0}.acr{padding:13px 0;cursor:pointer;-webkit-user-select:none;user-select:none}.acr .add{flex:none}.acn{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}.acc{color:var(--tx2);font-size:12px;white-space:nowrap;flex:none}.acs{margin-left:auto;display:flex;align-items:baseline;gap:8px;white-space:nowrap;flex:none;font-variant-numeric:tabular-nums}.acs b{font-size:14px}.acs small{color:var(--tx2);font-size:12px;min-width:30px;text-align:right}.acr .adch{flex:none;margin-left:2px;color:var(--tx2);transition:transform .25s}.adcg.open .adch{transform:rotate(180deg)}.asv{background:var(--bg);border-radius:12px;padding:11px 12px;margin:0 0 8px}.asv .acn{font-weight:600}.adcb>div{padding-bottom:0}.adsv0{padding:6px 0 12px;color:var(--tx2);font-size:13px}
+.adcg{padding:0 10px!important}.acr,.asv{gap:6px}.acr .acn{flex:none;font-size:14px}.acc{font-size:11px}.acs{gap:6px}.acs b{font-size:13px}.acs small{min-width:0;font-size:11.5px}.acr .adch{width:16px;height:16px;margin-left:0}.asv{padding:10px}.asv .acn{font-size:13px}
+.adcg{background:var(--bg)}.asv{background:var(--bg2)!important}
 </style>
 </head>
 <body>
@@ -1272,7 +1275,7 @@ function anStruct(rows,tot){
   const bar=CT.map(c=>c.m>0?`<i style="width:${c.m/t*100}%;background:${c.col}"></i>`:'').join('');
   const chev='<svg class="adch" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
   const body=CT.map(c=>{const ls=Object.values(c.l).sort((a,b)=>b.c-a.c||b.m-a.m).slice(0,10);
-    return `<div class="adcg${an.o[c.k]?' open':''}"><div class="adr adcat" data-cat="${c.k}" role="button" tabindex="0"><i class="add" style="background:${c.col}"></i><div class="nm"><b>${c.n}</b><small>${c.c} шт.</small></div><div class="vl"><b>${rub(c.m)}</b><small>${Math.round(c.m/t*100)}%</small></div>${chev}</div><div class="adcb"><div>${ls.length?ls.map(o=>`<div class="adr adsv"><div class="nm"><b>${esc(o.n)}</b><small>${o.c} шт.</small></div><div class="vl"><b>${rub(o.m)}</b><small>${Math.round(o.m/t*100)}%</small></div></div>`).join(''):'<div class="adsv0">Нет данных</div>'}</div></div></div>`}).join('');
+    return `<div class="adcg${an.o[c.k]?' open':''}"><div class="acr" data-cat="${c.k}" role="button" tabindex="0"><i class="add" style="background:${c.col}"></i><b class="acn">${c.n}</b><small class="acc">${c.c} шт.</small><span class="acs"><b>${rub(c.m)}</b><small>${Math.round(c.m/t*100)}%</small></span>${chev}</div><div class="adcb"><div>${ls.length?ls.map(o=>`<div class="asv"><b class="acn">${esc(o.n)}</b><small class="acc">${o.c} шт.</small><span class="acs"><b>${rub(o.m)}</b><small>${Math.round(o.m/t*100)}%</small></span></div>`).join(''):'<div class="adsv0">Нет данных</div>'}</div></div></div>`}).join('');
   return `<div class="adcd"><h4>Структура дохода</h4><div class="adsb">${bar}</div>${body}</div>`;
 }
 
@@ -2567,7 +2570,7 @@ setTimeout(()=>{if(g.offsetParent)load3()},3000);
 /* номер версии для «Дополнительных настроек» */
 
 
-window.__BUILD='20261122.0175';window.__VER='1.0';
+window.__BUILD='20261122.0185';window.__VER='1.0';
 </script>
 </body>
 </html>
