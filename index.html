@@ -427,6 +427,7 @@ input#fOrdP.xi:placeholder-shown,input#ordP.xi:placeholder-shown{padding-right:1
 
 .ghs .xclr{display:none!important}
 .adcat{cursor:pointer;-webkit-user-select:none;user-select:none}.adcat .adch{flex:none;margin-left:8px;color:var(--tx2);transition:transform .25s}.adcg.open .adch{transform:rotate(180deg)}.adcb{display:grid;grid-template-rows:0fr;transition:grid-template-rows .28s ease}.adcg.open .adcb{grid-template-rows:1fr}.adcb>div{overflow:hidden;min-height:0}.adsv{padding-left:22px}.adsv .nm b{font-weight:600}.adsv0{padding:8px 0 8px 22px;color:var(--tx2);font-size:13px}
+.adcg{border:1.5px solid var(--ln);border-radius:16px;padding:0 14px;margin-top:10px}.adcg>.adr{border-top:0!important;padding-top:12px;padding-bottom:12px}.adcg .adcb .adr:first-child{border-top:1px solid var(--ln)!important}.adcg .adr:last-child{padding-bottom:12px}
 </style>
 </head>
 <body>
@@ -1265,7 +1266,7 @@ function pages(){if(page==='rep'){$('#main').innerHTML='<div class="pg">'+anHtml
 let an={per:'m',y:0,m:0};
 const anCatK=n=>{const k=key(String(n||'').replace(/\s*×\s*\d+\s*$/,''));return (S.svcH||[]).some(h=>key(h.name)===k)?'h':(S.svcX||[]).some(x=>key(x.name)===k)?'x':'m'};
 function anStruct(rows,tot){
-  const CT=[{k:'m',n:'Основные услуги',col:'var(--les)'},{k:'x',n:'Доп. услуги',col:'var(--rec)'},{k:'h',n:'Почасовые услуги',col:'#2fb344'}].map(c=>({...c,m:0,c:0,l:{}}));
+  const CT=[{k:'m',n:'Основные',col:'var(--les)'},{k:'x',n:'Доп. услуги',col:'var(--rec)'},{k:'h',n:'Почасовые',col:'#2fb344'}].map(c=>({...c,m:0,c:0,l:{}}));
   rows.forEach(r=>{const raw=String(r.n||'').trim()||'Без названия',q=(raw.match(/×\s*(\d+)\s*$/)||[])[1],base=raw.replace(/\s*×\s*\d+\s*$/,'').trim()||raw,c=CT.find(x=>x.k===anCatK(base)),id=key(base);const o=c.l[id]=c.l[id]||{n:base,c:0,m:0};const u=Math.max(1,+q||1);o.c+=u;o.m+=r.m;c.m+=r.m;c.c+=u});
   const t=tot||1;an.o=an.o||{};
   const bar=CT.map(c=>c.m>0?`<i style="width:${c.m/t*100}%;background:${c.col}"></i>`:'').join('');
@@ -2566,7 +2567,7 @@ setTimeout(()=>{if(g.offsetParent)load3()},3000);
 /* номер версии для «Дополнительных настроек» */
 
 
-window.__BUILD='20261122.0170';window.__VER='1.0';
+window.__BUILD='20261122.0175';window.__VER='1.0';
 </script>
 </body>
 </html>
