@@ -426,6 +426,7 @@ input#fOrdP.xi:placeholder-shown,input#ordP.xi:placeholder-shown{padding-right:1
 *{scrollbar-width:none!important;-ms-overflow-style:none!important}*::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
 
 .ghs .xclr{display:none!important}
+.adcat{cursor:pointer;-webkit-user-select:none;user-select:none}.adcat .adch{flex:none;margin-left:8px;color:var(--tx2);transition:transform .25s}.adcg.open .adch{transform:rotate(180deg)}.adcb{display:grid;grid-template-rows:0fr;transition:grid-template-rows .28s ease}.adcg.open .adcb{grid-template-rows:1fr}.adcb>div{overflow:hidden;min-height:0}.adsv{padding-left:22px}.adsv .nm b{font-weight:600}.adsv0{padding:8px 0 8px 22px;color:var(--tx2);font-size:13px}
 </style>
 </head>
 <body>
@@ -1262,6 +1263,18 @@ function pages(){if(page==='rep'){$('#main').innerHTML='<div class="pg">'+anHtml
 
 /* sheet / drawer */
 let an={per:'m',y:0,m:0};
+const anCatK=n=>{const k=key(String(n||'').replace(/\s*×\s*\d+\s*$/,''));return (S.svcH||[]).some(h=>key(h.name)===k)?'h':(S.svcX||[]).some(x=>key(x.name)===k)?'x':'m'};
+function anStruct(rows,tot){
+  const CT=[{k:'m',n:'Основные услуги',col:'var(--les)'},{k:'x',n:'Доп. услуги',col:'var(--rec)'},{k:'h',n:'Почасовые услуги',col:'#2fb344'}].map(c=>({...c,m:0,c:0,l:{}}));
+  rows.forEach(r=>{const raw=String(r.n||'').trim()||'Без названия',q=(raw.match(/×\s*(\d+)\s*$/)||[])[1],base=raw.replace(/\s*×\s*\d+\s*$/,'').trim()||raw,c=CT.find(x=>x.k===anCatK(base)),id=key(base);const o=c.l[id]=c.l[id]||{n:base,c:0,m:0};const u=Math.max(1,+q||1);o.c+=u;o.m+=r.m;c.m+=r.m;c.c+=u});
+  const t=tot||1;an.o=an.o||{};
+  const bar=CT.map(c=>c.m>0?`<i style="width:${c.m/t*100}%;background:${c.col}"></i>`:'').join('');
+  const chev='<svg class="adch" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
+  const body=CT.map(c=>{const ls=Object.values(c.l).sort((a,b)=>b.c-a.c||b.m-a.m).slice(0,10);
+    return `<div class="adcg${an.o[c.k]?' open':''}"><div class="adr adcat" data-cat="${c.k}" role="button" tabindex="0"><i class="add" style="background:${c.col}"></i><div class="nm"><b>${c.n}</b><small>${c.c} шт.</small></div><div class="vl"><b>${rub(c.m)}</b><small>${Math.round(c.m/t*100)}%</small></div>${chev}</div><div class="adcb"><div>${ls.length?ls.map(o=>`<div class="adr adsv"><div class="nm"><b>${esc(o.n)}</b><small>${o.c} шт.</small></div><div class="vl"><b>${rub(o.m)}</b><small>${Math.round(o.m/t*100)}%</small></div></div>`).join(''):'<div class="adsv0">Нет данных</div>'}</div></div></div>`}).join('');
+  return `<div class="adcd"><h4>Структура дохода</h4><div class="adsb">${bar}</div>${body}</div>`;
+}
+
 /* Аналитика для звукорежиссёра: доход считается по заказам (услуга + стоимость) из карточек клиентов */
 function anHtmlS(desk){
   const hr=e=>(e.end-e.start)/60,pr=x=>+x.price||0,svc=x=>(x.service||'').trim()||'Без названия',nmOf=k=>(allStu().find(a=>a[0]===k)||[k,k])[1];
@@ -1299,7 +1312,7 @@ function anHtmlS(desk){
     const ct=an.per==='m'?'по дням':an.per==='y'?'по месяцам':'по годам';
     const chart=`<div class="adcd"><div class="adhd"><div><h4>Динамика дохода</h4><span class="sub">${ct}</span></div><div style="text-align:right"><div class="adkl">Максимум</div><b>${rub(mx)}</b></div></div><div class="adc"><div class="adp">${grid}<div class="adb">${bars}</div>${mx?'':'<div class="ade">Нет данных за выбранный период</div>'}</div></div></div>`;
     const tot=inc||1;
-    const struct=`<div class="adcd"><h4>Структура дохода</h4><div class="adsb">${groups.map(o=>o.m?`<i style="width:${o.m/tot*100}%;background:${o.col}"></i>`:'').join('')}</div>${groups.length?groups.map(o=>`<div class="adr"><i class="add" style="background:${o.col}"></i><div class="nm"><b>${esc(o.n)}</b><small>${o.c} зак.</small></div><div class="vl"><b>${rub(o.m)}</b><small>${Math.round(o.m/tot*100)}%</small></div></div>`).join(''):'<div class="empty" style="padding:22px 0">Нет данных</div>'}</div>`;
+    const struct=anStruct((()=>{const R=[];LO.forEach(x=>{const its=legIt(x),g=sum(its,i=>+i.p||0),f=g>0?pr(x)/g:1;its.forEach(i=>R.push({n:i.n,m:(+i.p||0)*f}))});return R})(),tot);
     const wd=Array(7).fill(0);L.forEach(e=>wd[(pd(e.date).getDay()+6)%7]++);const wm=Math.max(...wd,1);
     const week=`<div class="adcd"><h4>Загрузка по дням недели</h4><span class="sub">количество записей</span><div class="adw">${wd.map((v,i)=>`<div class="${v===wm&&v?'mx':''}" title="${v}"><i style="height:${v/wm*100}%;${v?'':'opacity:.25'}"></i><small>${DN[i]}</small></div>`).join('')}</div></div>`;
     const tp=Object.values(pm).sort((a,b)=>b.m-a.m||b.h-a.h).slice(0,6),tm0=tp.length?tp[0].m||1:1;
@@ -1370,7 +1383,7 @@ function anHtml(desk){
     const chart=`<div class="adcd"><div class="adhd"><div><h4>Динамика дохода</h4><span class="sub">${ct}</span></div><div style="text-align:right"><div class="adkl">Максимум</div><b>${rub(mx)}</b></div></div><div class="adc"><div class="adp">${grid}<div class="adb">${bars}</div>${mx?'':'<div class="ade">Нет данных за выбранный период</div>'}</div></div></div>`;
     /* структура */
     const ty=['lesson','rec'].map(t=>{const a=L.filter(e=>e.type===t);return{t,n:sum(a,evN),m:mon(a),h:sum(a,hr)}}),tot=inc||1;
-    const struct=`<div class="adcd"><h4>Структура дохода</h4><div class="adsb">${ty.map(o=>o.m?`<i style="width:${o.m/tot*100}%;background:var(--${o.t})"></i>`:'').join('')}</div>${ty.map(o=>`<div class="adr"><i class="add" style="background:var(--${o.t})"></i><div class="nm"><b>${T[o.t].n}</b><small>${subN(o.n)} зан. · ${H(o.h)}</small></div><div class="vl"><b>${rub(o.m)}</b><small>${Math.round(o.m/tot*100)}%</small></div></div>`).join('')}</div>`;
+    const struct=anStruct((()=>{const R=[];L.forEach(e=>{const m=hr(e)*rt(e),its=((e.it&&e.it.length)||String(e.service||'').trim())?legIt(e):[{n:T[e.type].n,p:m}],g=sum(its,i=>+i.p||0),f=g>0?m/g:1;its.forEach(i=>R.push({n:i.n,m:(+i.p||0)*f}))});return R})(),tot);
     /* дни недели */
     const wd=Array(7).fill(0);L.forEach(e=>wd[(pd(e.date).getDay()+6)%7]++);const wm=Math.max(...wd,1);
     const week=`<div class="adcd"><h4>Загрузка по дням недели</h4><span class="sub">количество занятий</span><div class="adw">${wd.map((v,i)=>`<div class="${v===wm&&v?'mx':''}" title="${v}"><i style="height:${v/wm*100}%;${v?'':'opacity:.25'}"></i><small>${DN[i]}</small></div>`).join('')}</div></div>`;
@@ -1837,6 +1850,7 @@ document.addEventListener('click',e=>{
   if(q('[data-ordok]')){if(!SOUND){vOk();return}const ce=ordCheck();if(ce){toast(ce);return}const nx=ordCommit();if(!ordSchedule()){if(nx){S.ord=S.ord.filter(v=>v!==nx);ordId=null}return}if(nx){save();const o9=stat(stuK);$('#ordKp').innerHTML=ordKpH(o9);$('#ordHist').innerHTML=ordHistH(o9);const l9=$('#stuList');if(l9)l9.innerHTML=stuRows();refreshDebt()}const had=!!ordId;ordId=null;cxReset();$('#ordS').value='';$('#ordP').value='';$('#ordPd').value='';$('#ordWrap').hidden=true;$('[data-ordok]').disabled=true;$('[data-ordok]').hidden=true;barSync();const fx=ordFinish();if(had)toast(fx==='part'?'Заказ сохранён · есть задолженность':'Заказ сохранён');return}
   if(q('[data-subtg]')){subSet(!subOpen);return}
   if(q('[data-addsub]')){if(!subOpen){subSet(true);return}const n=+$('#subN').value,b=basePrice()||0,u=$('#subP').value.trim()===''?b:(+$('#subP').value||0);if(n>0){S.subs.push({id:String(Date.now()),k:stuK,total:n,unit:u,price:n*u,base:b,disc:b>u?(b-u)*n:0,date:iso(new Date())});save();$('#sheetBody').innerHTML=stuHtml();render();const c=$('#subCard');if(c){c.classList.add('shine');c.addEventListener('animationend',()=>c.classList.remove('shine'),{once:true})}const sh=$('#sheet');if(sh)scFollow(()=>sh.scrollHeight,()=>true,900)}return}
+  if(b=q('[data-cat]')){const g=b.closest('.adcg');if(g){an.o=an.o||{};an.o[b.dataset.cat]=!an.o[b.dataset.cat];g.classList.toggle('open',!!an.o[b.dataset.cat])}return}
   if(b=q('[data-ap]')){const sg0=b.closest('.seg.sx'),oi=sg0?sg0.dataset.i:null;an.per=b.dataset.ap;anUp();if(oi!==null){const sg1=$$('.seg.sx').find(x=>x.querySelector('[data-ap]'));if(sg1){const ni=sg1.dataset.i;if(ni!==oi){sg1.dataset.i=oi;void sg1.offsetWidth;sg1.dataset.i=ni}}}return}
   if(b=q('[data-ao]')){const o=+b.dataset.ao;if(an.per==='y')an.y+=o;else{const d=new Date(an.y,an.m+o,1);an.y=d.getFullYear();an.m=d.getMonth()}anUp();return}
   if(q('#pgClose')){page='cal';first=true;return render()}
@@ -2552,7 +2566,7 @@ setTimeout(()=>{if(g.offsetParent)load3()},3000);
 /* номер версии для «Дополнительных настроек» */
 
 
-window.__BUILD='20261122.0160';window.__VER='1.0';
+window.__BUILD='20261122.0170';window.__VER='1.0';
 </script>
 </body>
 </html>
