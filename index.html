@@ -1641,7 +1641,7 @@ function detail(id){
   let dL=[],dT=0;{const os=e.own?S.ord.filter(o=>o.evId===e.id):[];os.forEach(o=>{legIt(o).forEach(r=>dL.push(r));dT+=+o.price||0});if(!dL.length&&((e.it&&e.it.length)||String(e.service||'').trim())){dL=legIt(e);dT=+e.price||0}}
   const dSv=dL.length?`<div class="card" style="margin-top:12px"><div class="r"><b>Услуги в записи</b><span>${dL.length} шт.</span></div>${dL.map(r=>`<div class="hit"><span>${esc(r.n)}</span>${r.p!=null&&r.p!==''?`<span>${rub(+r.p||0)}</span>`:''}</div>`).join('')}${dT>0?`<div class="r" style="margin-top:6px"><b>Итого</b><b>${rub(dT)}</b></div>`:''}</div>`:'';
   sheet(`<h3>${esc(e.person)}</h3><span class="badge" style="background:${e.col};color:${kOf(e.col)}">${T[e.type].n}</span>
-  ${dSv}<div class="card" style="margin-top:12px"><div class="r"><span>Дата</span><span>${pd(e.date).toLocaleDateString('ru-RU',{weekday:'short',day:'numeric',month:'long'})}</span></div><div class="r"><span>Время</span><span>${hm(e.start)}–${hm(e.end)}</span></div><div class="r"><span>${e.role==='sound'?'Звукорежиссёр':'Ведёт'}</span><span>${esc(e.owner)}</span></div>${e.service&&!dL.length?`<div class="r"><span>Услуга</span><span>${esc(e.service)}</span></div>`:''}${e.note?`<div class="r"><span>Заметка</span><span>${esc(e.note)}</span></div>`:''}</div>
+  <div class="card" style="margin-top:12px"><div class="r"><span>Дата</span><span>${pd(e.date).toLocaleDateString('ru-RU',{weekday:'short',day:'numeric',month:'long'})}</span></div><div class="r"><span>Время</span><span>${hm(e.start)}–${hm(e.end)}</span></div><div class="r"><span>${e.role==='sound'?'Звукорежиссёр':'Ведёт'}</span><span>${esc(e.owner)}</span></div>${e.service&&!dL.length?`<div class="r"><span>Услуга</span><span>${esc(e.service)}</span></div>`:''}${e.note?`<div class="r"><span>Заметка</span><span>${esc(e.note)}</span></div>`:''}</div>${dSv}
   <div class="dbt">${e.own?`<button class="btn" data-edit="${id}">Изменить</button><button class="btn d" data-del="${id}">Удалить</button>`:'<p class="empty" style="padding:14px 0 0">Это запись другого пользователя — только просмотр</p>'}</div>`);
 }
 function form(id,pre){
@@ -2501,7 +2501,7 @@ setTimeout(()=>{if(g.offsetParent)load3()},3000);
 /* номер версии для «Дополнительных настроек» */
 
 
-window.__BUILD='20261122.0100';window.__VER='1.0';
+window.__BUILD='20261122.0105';window.__VER='1.0';
 </script>
 </body>
 </html>
