@@ -1858,7 +1858,7 @@ document.addEventListener('click',e=>{
   if(q('[data-ordok]')){if(!SOUND){vOk();return}const ce=ordCheck();if(ce){toast(ce);return}const nx=ordCommit();if(!ordSchedule()){if(nx){S.ord=S.ord.filter(v=>v!==nx);ordId=null}return}if(nx){save();const o9=stat(stuK);$('#ordKp').innerHTML=ordKpH(o9);$('#ordHist').innerHTML=ordHistH(o9);const l9=$('#stuList');if(l9)l9.innerHTML=stuRows();refreshDebt()}const had=!!ordId;ordId=null;cxReset();$('#ordS').value='';$('#ordP').value='';$('#ordPd').value='';$('#ordWrap').hidden=true;$('[data-ordok]').disabled=true;$('[data-ordok]').hidden=true;barSync();const fx=ordFinish();if(had)toast(fx==='part'?'Заказ сохранён · есть задолженность':'Заказ сохранён');return}
   if(q('[data-subtg]')){subSet(!subOpen);return}
   if(q('[data-addsub]')){if(!subOpen){subSet(true);return}const n=+$('#subN').value,b=basePrice()||0,u=$('#subP').value.trim()===''?b:(+$('#subP').value||0);if(n>0){S.subs.push({id:String(Date.now()),k:stuK,total:n,unit:u,price:n*u,base:b,disc:b>u?(b-u)*n:0,date:iso(new Date())});save();$('#sheetBody').innerHTML=stuHtml();render();const c=$('#subCard');if(c){c.classList.add('shine');c.addEventListener('animationend',()=>c.classList.remove('shine'),{once:true})}const sh=$('#sheet');if(sh)scFollow(()=>sh.scrollHeight,()=>true,900)}return}
-  if(b=q('[data-cat]')){const g=b.closest('.adcg');if(g){an.o=an.o||{};an.o[b.dataset.cat]=!an.o[b.dataset.cat];g.classList.toggle('open',!!an.o[b.dataset.cat])}return}
+  if(b=q('[data-cat]')){const g=b.closest('.adcg');if(g){const k=b.dataset.cat,op=!(an.o&&an.o[k]);an.o=op?{[k]:true}:{};document.querySelectorAll('.adcg').forEach(x=>{const c=x.querySelector('[data-cat]');x.classList.toggle('open',!!(c&&an.o[c.dataset.cat]))})}return}
   if(b=q('[data-ap]')){const sg0=b.closest('.seg.sx'),oi=sg0?sg0.dataset.i:null;an.per=b.dataset.ap;anUp();if(oi!==null){const sg1=$$('.seg.sx').find(x=>x.querySelector('[data-ap]'));if(sg1){const ni=sg1.dataset.i;if(ni!==oi){sg1.dataset.i=oi;void sg1.offsetWidth;sg1.dataset.i=ni}}}return}
   if(b=q('[data-ao]')){const o=+b.dataset.ao;if(an.per==='y')an.y+=o;else{const d=new Date(an.y,an.m+o,1);an.y=d.getFullYear();an.m=d.getMonth()}anUp();return}
   if(q('#pgClose')){page='cal';first=true;return render()}
@@ -2574,7 +2574,7 @@ setTimeout(()=>{if(g.offsetParent)load3()},3000);
 /* номер версии для «Дополнительных настроек» */
 
 
-window.__BUILD='20261122.0225';window.__VER='1.0';
+window.__BUILD='20261122.0230';window.__VER='1.0';
 </script>
 </body>
 </html>
