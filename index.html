@@ -2069,7 +2069,7 @@ document.addEventListener('contextmenu',e=>{if(st.el&&e.target.closest&&e.target
 document.addEventListener('click',e=>{if(st.sw&&e.target.closest&&e.target.closest('.ev')){e.stopPropagation();e.preventDefault()}},true);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&st.on){cleanup()}});
 const css=document.createElement('style');
-css.textContent='.ev{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}.ev.dragging{box-shadow:0 10px 28px rgba(0,0,0,.28);opacity:.92;transition:none!important;cursor:grabbing}.evdrag,.evdrag *{cursor:grabbing!important;-webkit-user-select:none;user-select:none}.evph{position:absolute;left:2px;right:3px;border-radius:9px;border:2px dashed var(--ac);background:rgba(var(--acr),.16);z-index:2;pointer-events:none;display:flex;align-items:flex-end;justify-content:flex-end;padding:4px 7px;font-size:11px;box-sizing:border-box}.evph b{font-size:11px}.evtip{position:fixed;z-index:9999;pointer-events:none;background:var(--tx);color:var(--bg);font-weight:700;font-size:16px;line-height:1;padding:9px 14px;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.3);white-space:nowrap}';
+css.textContent='.ev{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}.ev.dragging{box-shadow:0 10px 28px rgba(0,0,0,.28);opacity:.92;transition:none!important;cursor:grabbing}.evdrag,.evdrag *{cursor:grabbing!important;-webkit-user-select:none;user-select:none}.evph{position:absolute;left:2px;right:3px;border-radius:9px;border:2px dashed var(--ac);background:rgba(var(--acr),.16);z-index:2;pointer-events:none;display:flex;align-items:flex-end;justify-content:flex-end;padding:4px 7px;font-size:11px;box-sizing:border-box}.evph b{font-size:11px}@media (hover:hover){.ev{cursor:pointer}.ev:not(.oth){cursor:grab}.mev,.mc{cursor:pointer}}.evtip{position:fixed;z-index:9999;pointer-events:none;background:var(--tx);color:var(--bg);font-weight:700;font-size:16px;line-height:1;padding:9px 14px;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.3);white-space:nowrap}';
 document.head.appendChild(css);
 })();
 
@@ -2503,7 +2503,7 @@ setTimeout(()=>{if(g.offsetParent)load3()},3000);
 /* номер версии для «Дополнительных настроек» */
 
 
-window.__BUILD='20261122.0125';window.__VER='1.0';
+window.__BUILD='20261122.0130';window.__VER='1.0';
 </script>
 </body>
 </html>
