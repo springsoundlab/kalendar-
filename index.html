@@ -433,6 +433,7 @@ input#fOrdP.xi:placeholder-shown,input#ordP.xi:placeholder-shown{padding-right:1
 .adcg{background:var(--bg)}.asv{background:var(--bg2)!important}
 .adcg{background:color-mix(in srgb,var(--bg2) 93%,#000)!important;margin-top:8px!important;border-radius:14px}.acr{padding:7px 0!important}.adcb>div{padding-bottom:0}.adcg.open .adcb>div{padding-bottom:2px}.adcg .asv:last-child{margin-bottom:8px}
 .asv{background:color-mix(in srgb,var(--bg2),#fff 30%)!important}
+.adcg{background:var(--bg2)!important}.adcw{margin:2px 0 8px;padding:6px 10px;background:color-mix(in srgb,var(--tx) 5%,transparent);border-radius:12px}.asv{background:none!important;border-radius:0!important;padding:5px 0!important;margin:0!important}.adcg .asv:last-child{margin-bottom:0!important}.adsv0{padding:6px 0!important}
 </style>
 </head>
 <body>
@@ -1277,7 +1278,7 @@ function anStruct(rows,tot){
   const bar=CT.map(c=>c.m>0?`<i style="width:${c.m/t*100}%;background:${c.col}"></i>`:'').join('');
   const chev='<svg class="adch" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
   const body=CT.map(c=>{const ls=Object.values(c.l).sort((a,b)=>b.c-a.c||b.m-a.m).slice(0,10);
-    return `<div class="adcg${an.o[c.k]?' open':''}"><div class="acr" data-cat="${c.k}" role="button" tabindex="0"><i class="add" style="background:${c.col}"></i><b class="acn">${c.n}</b><small class="acc">${c.c} шт.</small><span class="acs"><b>${rub(c.m)}</b><small>${Math.round(c.m/t*100)}%</small></span>${chev}</div><div class="adcb"><div>${ls.length?ls.map(o=>`<div class="asv"><b class="acn">${esc(o.n)}</b><small class="acc">${o.c} шт.</small><span class="acs"><b>${rub(o.m)}</b><small>${Math.round(o.m/t*100)}%</small></span></div>`).join(''):'<div class="adsv0">Нет данных</div>'}</div></div></div>`}).join('');
+    return `<div class="adcg${an.o[c.k]?' open':''}"><div class="acr" data-cat="${c.k}" role="button" tabindex="0"><i class="add" style="background:${c.col}"></i><b class="acn">${c.n}</b><small class="acc">${c.c} шт.</small><span class="acs"><b>${rub(c.m)}</b><small>${Math.round(c.m/t*100)}%</small></span>${chev}</div><div class="adcb"><div><div class="adcw">${ls.length?ls.map(o=>`<div class="asv"><b class="acn">${esc(o.n)}</b><small class="acc">${o.c} шт.</small><span class="acs"><b>${rub(o.m)}</b><small>${Math.round(o.m/t*100)}%</small></span></div>`).join(''):'<div class="adsv0">Нет данных</div>'}</div></div></div></div>`}).join('');
   return `<div class="adcd"><h4>Структура дохода</h4><div class="adsb">${bar}</div>${body}</div>`;
 }
 
@@ -2572,7 +2573,7 @@ setTimeout(()=>{if(g.offsetParent)load3()},3000);
 /* номер версии для «Дополнительных настроек» */
 
 
-window.__BUILD='20261122.0195';window.__VER='1.0';
+window.__BUILD='20261122.0200';window.__VER='1.0';
 </script>
 </body>
 </html>
