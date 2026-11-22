@@ -2078,7 +2078,7 @@ function endH(ok){
   if(!ok||(h.ns===ev.start&&h.ne===ev.end)){render();return}
   const c=calAll().find(x=>x.id!==ev.id&&x.date===ev.date&&x.start<h.ne&&h.ns<x.end);
   if(c){render();toast('Студия занята: '+c.person+', '+hm(c.start)+'–'+hm(c.end));return}
-  ev.start=h.ns;ev.end=h.ne;save();render();
+  ev.start=h.ns;ev.end=h.ne;save();render();toast('Время изменено: '+hm(h.ns)+'–'+hm(h.ne));
 }
 document.addEventListener('pointerdown',e=>{
   const hd=e.target.closest&&e.target.closest('.evh');
@@ -2552,7 +2552,7 @@ setTimeout(()=>{if(g.offsetParent)load3()},3000);
 /* номер версии для «Дополнительных настроек» */
 
 
-window.__BUILD='20261122.0145';window.__VER='1.0';
+window.__BUILD='20261122.0150';window.__VER='1.0';
 </script>
 </body>
 </html>
