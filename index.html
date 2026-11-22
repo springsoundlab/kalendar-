@@ -1337,7 +1337,7 @@ function anHtmlS(desk){
   if(an.per==='m'){const n=new Date(Y,M+1,0).getDate(),v=Array(n).fill(0);L.forEach(e=>{v[+e.date.slice(8,10)-1]+=hr(e)});chart=bars(v,v.map((_,k)=>(k+1)%5===1?k+1:''),H);ct='Часы по дням'}
   else if(an.per==='y'){const v=Array(12).fill(0);LO.forEach(x=>{v[+x.date.slice(5,7)-1]+=pr(x)});chart=bars(v,['Я','Ф','М','А','М','И','И','А','С','О','Н','Д'],rub);ct='Доход по месяцам'}
   else{const ys=[...new Set(S.ord.map(x=>x.date.slice(0,4)))].sort(),v=ys.map(y=>sum(S.ord.filter(x=>x.date.startsWith(y)),pr));chart=ys.length?bars(v,ys.map(y=>y.slice(2)),rub):'';ct='Доход по годам'}
-  const byT=groups.map(o=>`<div class="card" style="margin:0 0 10px"><div class="r"><b>${esc(o.n)}</b><span>${rub(o.m)}</span></div><div class="r"><span>${o.c} зак.</span><span>${Math.round(o.m/(inc||1)*100)}%</span></div></div>`).join('');
+  const byT=`<div style="margin:0 0 10px">${anStruct((()=>{const R=[];LO.forEach(x=>{const its=legIt(x),g=sum(its,i=>+i.p||0),f=g>0?pr(x)/g:1;its.forEach(i=>R.push({n:i.n,m:(+i.p||0)*f}))});return R})(),inc||1)}</div>`;
   const top=Object.values(pm).sort((a,b)=>b.m-a.m||b.h-a.h).slice(0,5).map(o=>`<div class="r"><span>${esc(o.n)} · ${o.c}</span><span>${rub(o.m)}</span></div>`).join('');
   return `<button class="ib mbtn" data-menu aria-label="Меню"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><button class="xbtn" aria-label="Закрыть"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg></button>`+`<h3 style="text-transform:capitalize">Аналитика</h3>
   <div class="seg sx" data-i="${an.per==='y'?0:an.per==='m'?1:2}" style="margin-bottom:12px"><button class="${an.per==='y'?'on':''}" data-ap="y">Год</button><button class="${an.per==='m'?'on':''}" data-ap="m">Месяц</button><button class="${an.per==='all'?'on':''}" data-ap="all">Всё время</button></div>
@@ -1365,7 +1365,7 @@ function anHtml(desk){
   if(an.per==='m'){const n=new Date(Y,M+1,0).getDate(),v=Array(n).fill(0);L.forEach(e=>{v[+e.date.slice(8,10)-1]+=hr(e)});chart=bars(v,v.map((_,k)=>(k+1)%5===1?k+1:''),H);ct='Часы по дням'}
   else if(an.per==='y'){const v=Array(12).fill(0);L.forEach(e=>{v[+e.date.slice(5,7)-1]+=hr(e)*rt(e)});chart=bars(v,['Я','Ф','М','А','М','И','И','А','С','О','Н','Д'],rub);ct='Доход по месяцам'}
   else{const ys=[...new Set(S.ev.map(e=>e.date.slice(0,4)))].sort(),v=ys.map(y=>sum(S.ev.filter(e=>e.date.startsWith(y)),e=>hr(e)*rt(e)));chart=ys.length?bars(v,ys.map(y=>y.slice(2)),rub):'';ct='Доход по годам'}
-  const byT=['lesson','rec'].map(t=>{const a=L.filter(e=>e.type===t);return `<div class="card" style="margin:0 0 10px"><div class="r"><b>${T[t].n}</b><span>${rub(sum(a,e=>hr(e)*rt(e)))}</span></div><div class="r"><span>${a.length} занятий</span><span>${H(sum(a,hr))}</span></div></div>`}).join('');
+  const byT=`<div style="margin:0 0 10px">${anStruct((()=>{const R=[];L.forEach(e=>{const m=hr(e)*rt(e),its=((e.it&&e.it.length)||String(e.service||'').trim())?legIt(e):[{n:T[e.type].n,p:m}],g=sum(its,i=>+i.p||0),f=g>0?m/g:1;its.forEach(i=>R.push({n:i.n,m:(+i.p||0)*f}))});return R})(),inc||1)}</div>`;
   const pm={};L.forEach(e=>{const n=(e.person||'').trim();if(!n||e.hh)return;(pm[n]=pm[n]||{c:0,h:0,m:0});pm[n].c+=evN(e);pm[n].h+=hr(e);pm[n].m+=hr(e)*rt(e)});
   const top=Object.entries(pm).sort((a,b)=>b[1].m-a[1].m||b[1].h-a[1].h).slice(0,5).map(([n,o])=>`<div class="r"><span>${esc(n)} · ${o.c}</span><span>${rub(o.m)}</span></div>`).join('');
   const all=S.ev,aInc=sum(all,e=>hr(e)*rt(e)),aH=sum(all,hr);
@@ -2573,7 +2573,7 @@ setTimeout(()=>{if(g.offsetParent)load3()},3000);
 /* номер версии для «Дополнительных настроек» */
 
 
-window.__BUILD='20261122.0200';window.__VER='1.0';
+window.__BUILD='20261122.0210';window.__VER='1.0';
 </script>
 </body>
 </html>
