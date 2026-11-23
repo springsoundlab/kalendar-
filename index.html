@@ -506,6 +506,15 @@ input#fOrdP.xi:placeholder-shown,input#ordP.xi:placeholder-shown{padding-right:1
 .btip{position:fixed;z-index:9999;max-width:320px;padding:12px 14px;border-radius:14px;background:var(--tx);color:var(--bg);font-size:12.5px;line-height:1.45;box-shadow:0 10px 30px rgba(0,0,0,.35);pointer-events:none;opacity:0;transform:translateY(4px);transition:opacity .15s,transform .15s}.btip.on{opacity:1;transform:none}.btip b{display:block;font-size:13.5px;margin-bottom:6px}.btip div+div{margin-top:3px}
 
 .bex .brw[data-tt],.bhm i[data-tt],.bch rect[data-tt],.bsr[data-tt],.bsg circle[data-tt]{cursor:pointer}
+
+/* календарь: скруглённые края в общем стиле */
+@media (min-width:900px){
+#main .wh,#main .mh{margin:12px 16px 0;border:1px solid var(--ln);border-radius:18px 18px 0 0;overflow:hidden}
+#main .cal,#main .mg{margin:0 16px 16px;border:1px solid var(--ln);border-top:0;border-radius:0 0 18px 18px;overflow:hidden}
+#main .mg{min-height:calc(100% - 58px)}
+#main .col:last-child{border-right:0}
+#main .mc:nth-last-child(-n+7){border-bottom:0}
+}
 </style>
 </head>
 <body>
@@ -2720,7 +2729,7 @@ setTimeout(()=>{if(g.offsetParent)load3()},3000);
 /* номер версии для «Дополнительных настроек» */
 
 
-window.__BUILD='20261124.0120';window.__VER='1.0';
+window.__BUILD='20261124.0130';window.__VER='1.0';
 </script>
 </body>
 </html>
