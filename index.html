@@ -507,11 +507,11 @@ input#fOrdP.xi:placeholder-shown,input#ordP.xi:placeholder-shown{padding-right:1
 
 .bex .brw[data-tt],.bhm i[data-tt],.bch rect[data-tt],.bsr[data-tt],.bsg circle[data-tt]{cursor:pointer}
 
-/* календарь: скруглённые края в общем стиле */
+/* календарь: скруглённая рамка вокруг области прокрутки (шапка с датами не двигается) */
 @media (min-width:900px){
-#main .wh,#main .mh{margin:12px 16px 0;border:1px solid var(--ln);border-radius:18px 18px 0 0;overflow:hidden}
-#main .cal,#main .mg{margin:0 16px 16px;border:1px solid var(--ln);border-top:0;border-radius:0 0 18px 18px;overflow:hidden}
-#main .mg{min-height:calc(100% - 58px)}
+#main:has(>.wh),#main:has(>.mh){margin:12px 16px 16px;border:1px solid var(--ln);border-radius:18px;overflow-x:hidden}
+#main>.wh,#main>.mh{margin:0;border-top:0;border-radius:0}
+#main>.cal,#main>.mg{margin:0}
 #main .col:last-child{border-right:0}
 #main .mc:nth-last-child(-n+7){border-bottom:0}
 }
@@ -2729,7 +2729,7 @@ setTimeout(()=>{if(g.offsetParent)load3()},3000);
 /* номер версии для «Дополнительных настроек» */
 
 
-window.__BUILD='20261124.0130';window.__VER='1.0';
+window.__BUILD='20261124.0150';window.__VER='1.0';
 </script>
 </body>
 </html>
