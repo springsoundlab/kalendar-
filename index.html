@@ -490,6 +490,17 @@ input#fOrdP.xi:placeholder-shown,input#ordP.xi:placeholder-shown{padding-right:1
 .bcl2{grid-column:1/span 4!important}.bcs{grid-column:5/span 4!important}.bdc{grid-column:9/span 4;grid-row:12/span 3}
 @media (min-width:1181px){.bdc{grid-row:12/span 3}}
 @media (min-width:1181px){.bnh>div:first-child{display:flex;align-items:baseline;gap:12px}.bsb{margin:0}.bgl svg{position:absolute;left:12px;right:12px;top:30px;bottom:6px;width:calc(100% - 24px);height:calc(100% - 36px)}.bn>.btl .bs{font-size:11px;margin-top:3px}}
+
+@media (min-width:1181px){
+.bn>.bht{grid-column:1/span 6;grid-row:9/span 6}
+.bn>.bex{grid-column:7/span 3;grid-row:9/span 3}
+.bn>.bcl2{grid-column:10/span 3!important;grid-row:9/span 3}
+.bn>.bcs{grid-column:7/span 3!important;grid-row:12/span 3;overflow:hidden}
+.bn>.bdc{grid-column:10/span 3;grid-row:12/span 3}
+.bht h4{font-size:15px}.bhm{font-size:12px;gap:5px 8px!important;margin-top:14px}.bhm .bhh{font-size:12px}.bhm .bhd{font-size:12px}.bhm i{border-radius:9px}
+.bex .brw{flex-wrap:nowrap;gap:10px}.bex .brw>span:first-child{flex:1 1 0;min-width:0}.bex .brw>span:last-child{flex:none;white-space:nowrap}.bex .bhd{flex-wrap:wrap}
+.bdc .bs{line-height:1.35}
+}
 </style>
 </head>
 <body>
@@ -1373,7 +1384,7 @@ function anBento(d){
   ${tile('btl btl1',d.cnt.t,d.cnt.v,d.cnt.d,sp(bk.map(b=>b.c),'var(--rec)','c'))}
   ${d.avg?tile('btl btl2',d.avg.t,d.avg.v,d.avg.d,sp(bk.map(b=>b.c?b.m/b.c:0),'var(--les)','a')).replace('class="bt btl btl2"','class="bt btl btl2"')+hrsT.replace('class="bt btl"','class="bt btl btl3"'):hrsT.replace('class="bt btl"','class="bt btl btl2"')+act}
   ${gau}
-  ${dyn}${d.struct[0]}${heat}<div class="bt bex">${d.extra}</div>${cli.replace('class="bt bcl"','class="bt bcl bcl2"')}<div class="bt bcs"><h4>${d.costT}</h4>${(d.cost||d.struct[2]).map(r=>`<div class="brw"><span>${r[0]}</span><b>${r[1]}</b></div>`).join('')}</div><div class="bt bdc"><h4>Скидки и бонусы</h4><div class="bv">${d.disc.sum?'−'+rub(d.disc.sum):rub(0)}</div><div class="bs">${d.disc.n} ${d.disc.n===1?'заказ':'заказов'} со скидкой · ${(d.disc.sum?Math.round(d.disc.sum/(d.incN+d.disc.sum)*1000)/10:0).toLocaleString('ru-RU')}% от суммы до скидок</div><div class="bbar" style="margin-top:10px"><i style="width:${Math.min(100,d.disc.sum?d.disc.sum/(d.incN+d.disc.sum)*100:0)}%;background:var(--les)"></i></div></div>
+  ${dyn}${d.struct[0]}${heat}<div class="bt bex">${d.extra}</div>${cli.replace('class="bt bcl"','class="bt bcl bcl2"')}<div class="bt bcs"><h4>${d.costT}</h4>${(d.cost||d.struct[2]).slice(0,3).map(r=>`<div class="brw"><span>${r[0]}</span><b>${r[1]}</b></div>`).join('')}</div><div class="bt bdc"><h4>Скидки и бонусы</h4><div class="bv">${d.disc.sum?'−'+rub(d.disc.sum):rub(0)}</div><div class="bs">${d.disc.n} ${d.disc.n===1?'заказ':'заказов'} со скидкой · ${(d.disc.sum?Math.round(d.disc.sum/(d.incN+d.disc.sum)*1000)/10:0).toLocaleString('ru-RU')}% от суммы до скидок</div><div class="bbar" style="margin-top:10px"><i style="width:${Math.min(100,d.disc.sum?d.disc.sum/(d.incN+d.disc.sum)*100:0)}%;background:var(--les)"></i></div></div>
   </div>${d.note?`<p class="adnote">${d.note}</p>`:''}</div>`;
 }
 function anStruct(rows,tot,part){
@@ -1443,7 +1454,7 @@ function anHtmlS(desk){
     const owed=o=>o.st==='unpaid'?pr(o):o.st==='part'?Math.max(0,pr(o)-(+o.paid||0)):0,pend=S.ord.filter(o=>owed(o)>0).sort((a,b)=>a.date.localeCompare(b.date)),pT=sum(pend,owed);
     const ini=nm=>String(nm||'?').trim().split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase(),AC=['var(--les)','var(--rec)','#2fb344','var(--ac)'];
     const attn=pend.length?`<b>${rub(pT)}</b> ждут оплаты (${pend.length}). Самая старая — ${dAgo(pend[0].date)} дн. назад.`:'Неоплаченных заказов нет — всё в порядке.';
-    const extra=`<div class="bhd"><h4>Ожидают оплаты</h4>${pT?`<span class="btg y">${rub(pT)}</span>`:''}</div>${pend.length?pend.slice(0,4).map((o,i)=>`<div class="brw"><span><i class="bav" style="background:${AC[i%4]}">${esc(ini(nmOf(o.k)))}</i>${esc(nmOf(o.k))} · ${esc(svc(o))}</span><span><span class="btg ${dAgo(o.date)>=3?'r':'y'}">${dAgo(o.date)?dAgo(o.date)+' дн.':'сегодня'}</span><b>${rub(owed(o))}</b></span></div>`).join(''):'<div class="bem2">Все заказы оплачены</div>'}`;
+    const extra=`<div class="bhd"><h4>Ожидают оплаты</h4>${pT?`<span class="btg y">${rub(pT)}</span>`:''}</div>${pend.length?pend.slice(0,3).map((o,i)=>`<div class="brw"><span><i class="bav" style="background:${AC[i%4]}">${esc(ini(nmOf(o.k)))}</i>${esc(nmOf(o.k))} · ${esc(svc(o))}</span><span><span class="btg ${dAgo(o.date)>=3?'r':'y'}">${dAgo(o.date)?dAgo(o.date)+' дн.':'сегодня'}</span><b>${rub(owed(o))}</b></span></div>`).join(''):'<div class="bem2">Все заказы оплачены</div>'}`;
     return anBento({adn,bk,ct,L,wi:LO.map(x=>({date:x.date,m:pr(x)})),curk:LO.filter(x=>x.k&&!x.hh).map(x=>({k:x.k,date:x.date})),allk:S.ord.filter(x=>x.k&&!x.hh).map(x=>({k:x.k,date:x.date})),struct,allc,
       incN:incM,wiAll:S.ord.map(x=>({date:x.date,m:pr(x)})),rep:LO.map(o=>[o.date,nmOf(o.k),svc(o),'',Math.round(pr(o))]),sub:'Студия звукозаписи',actT:'Активных клиентов',costT:'Средний чек по услугам',disc:{n:LO.filter(o=>o.dc>0&&o.dc<100).length,sum:LO.reduce((a,o)=>o.dc>0&&o.dc<100?a+Math.max(0,Math.round(pr(o)/(1-o.dc/100))-pr(o)):a,0)},hero:{t:incT,v:rub(incM),d:hdl},cnt:{t:'Заказов',v:cnt,d:dl(cnt,pc)},avg:{t:'Средний чек',v:rub(avg),d:dl(avg,pc?pi/pc:0)},hrs:{t:'Часов в студии',v:H(hrs),d:dl(hrs,ph)},
       dp:incP?Math.round((incM-incP)/incP*100):null,vs:incV,attn,extra,heatT:'Загрузка студии',cliT:'Клиенты',cliR:'возвращаются',cliN:'повторных',
@@ -1519,7 +1530,7 @@ function anHtml(desk){
     const idle=Object.values(lastE).map(x=>({n:x.n,d:dAgo(x.date),date:x.date})).filter(x=>x.d>=21&&x.d<=150&&x.date<=iso(new Date())).sort((a,b)=>b.d-a.d);
     const ini=nm=>String(nm||'?').trim().split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase(),AC=['var(--les)','var(--rec)','#2fb344','var(--ac)'];
     const attn=idle.length?`<b>${esc(idle[0].n)}</b> не занимается ${idle[0].d} дн.${idle.length>1?` И ещё ${idle.length-1} ученик${idle.length-1===1?'':'ов'} давно не приходили.`:''}`:'Все ученики занимаются регулярно.';
-    const extra=`<div class="bhd"><h4>Требуют внимания</h4>${idle.length?`<span class="btg y">${idle.length}</span>`:''}</div>${idle.length?idle.slice(0,4).map((o,i)=>`<div class="brw"><span><i class="bav" style="background:${AC[i%4]}">${esc(ini(o.n))}</i>${esc(o.n)} · нет занятий ${o.d} дн.</span><span class="btg ${o.d>=30?'r':'y'}">${o.d>=30?'риск ухода':'давно не было'}</span></div>`).join(''):'<div class="bem2">Все ученики занимаются регулярно</div>'}`;
+    const extra=`<div class="bhd"><h4>Требуют внимания</h4>${idle.length?`<span class="btg y">${idle.length}</span>`:''}</div>${idle.length?idle.slice(0,3).map((o,i)=>`<div class="brw"><span><i class="bav" style="background:${AC[i%4]}">${esc(ini(o.n))}</i>${esc(o.n)} · нет занятий ${o.d} дн.</span><span class="btg ${o.d>=30?'r':'y'}">${o.d>=30?'риск ухода':'давно не было'}</span></div>`).join(''):'<div class="bem2">Все ученики занимаются регулярно</div>'}`;
     return anBento({adn,bk,ct,L,wi:L.map(e=>({date:e.date,m:hr(e)*rt(e)})),curk:L.filter(e=>String(e.person||'').trim()&&!e.hh).map(e=>({k:key(e.person),date:e.date})),allk:S.ev.filter(e=>String(e.person||'').trim()&&!e.hh).map(e=>({k:key(e.person),date:e.date})),struct,allc,
       incN:incM,wiAll:S.ev.map(e=>({date:e.date,m:hr(e)*rt(e)})),rep:L.map(e=>[e.date,String(e.person||''),String(e.service||'').trim()||T[e.type].n,+hr(e).toFixed(2),Math.round(hr(e)*rt(e))]),vocal:1,sub:'Преподаватель по вокалу',disc:{n:L.filter(e=>e.dc>0&&e.dc<100).length,sum:L.reduce((a,e)=>e.dc>0&&e.dc<100?a+Math.max(0,Math.round((+e.price||0)/(1-e.dc/100))-(+e.price||0)):a,0)},actT:'Активных учеников',costT:'Стоимость часа',cost:[['Средний доход за час',rub(hrs?inc/hrs:0)],['Основная ставка',basePrice()?rub(basePrice()):'не задана'],['Средний чек',rub(avg)]],hero:{t:incT,v:rub(incM),d:hdl},cnt:{t:'Занятий',v:cnt,d:dl(cnt,pc)},hrs:{t:'Часов',v:H(hrs),d:dl(hrs,ph)},
       dp:incP?Math.round((incM-incP)/incP*100):null,vs:incV,attn,extra,heatT:'Загрузка расписания',cliT:'Ученики',cliR:'постоянные',cliN:'постоянных',
@@ -2695,7 +2706,7 @@ setTimeout(()=>{if(g.offsetParent)load3()},3000);
 /* номер версии для «Дополнительных настроек» */
 
 
-window.__BUILD='20261123.2330';window.__VER='1.0';
+window.__BUILD='20261124.0020';window.__VER='1.0';
 </script>
 </body>
 </html>
