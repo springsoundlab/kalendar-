@@ -502,8 +502,10 @@ input#fOrdP.xi:placeholder-shown,input#ordP.xi:placeholder-shown{padding-right:1
 .bdc .bs{line-height:1.35}
 }
 
-@media (min-width:1181px){.bn>.bex{display:flex;flex-direction:column}.bex .bscr{flex:1;min-height:0;overflow-y:auto;margin-top:6px;overscroll-behavior:contain}.bex .bscr .brw:first-child{border-top:0}.bex .brw[data-tt]{cursor:default}}
+@media (min-width:1181px){.bn>.bex{display:flex;flex-direction:column}.bex .bscr{flex:1;min-height:0;overflow-y:auto;margin-top:6px;overscroll-behavior:contain}.bex .bscr .brw:first-child{border-top:0}}
 .btip{position:fixed;z-index:9999;max-width:320px;padding:12px 14px;border-radius:14px;background:var(--tx);color:var(--bg);font-size:12.5px;line-height:1.45;box-shadow:0 10px 30px rgba(0,0,0,.35);pointer-events:none;opacity:0;transform:translateY(4px);transition:opacity .15s,transform .15s}.btip.on{opacity:1;transform:none}.btip b{display:block;font-size:13.5px;margin-bottom:6px}.btip div+div{margin-top:3px}
+
+.bex .brw[data-tt],.bhm i[data-tt],.bch rect[data-tt],.bsr[data-tt],.bsg circle[data-tt]{cursor:pointer}
 </style>
 </head>
 <body>
@@ -1399,9 +1401,10 @@ function anStruct(rows,tot,part){
   const body=CT.map(c=>{const ls=Object.values(c.l).sort((a,b)=>b.c-a.c||b.m-a.m).slice(0,10);
     return `<div class="adcg${an.o[c.k]?' open':''}"><div class="acr" data-cat="${c.k}" role="button" tabindex="0"><i class="add" style="background:${c.col}"></i><b class="acn">${c.n}</b><small class="acq">${c.c} шт.</small><span class="acs"><b>${rub(c.m)}</b><small>${Math.round(c.m/t*100)}%</small></span>${chev}</div><div class="adcb"><div><div class="adcw">${ls.length?ls.map(o=>`<div class="asv"><b class="acn">${esc(o.n)}</b><small class="acq">${o.c} шт.</small><span class="acs"><b>${rub(o.m)}</b><small>${Math.round(o.m/t*100)}%</small></span></div>`).join(''):'<div class="adsv0">Нет данных</div>'}</div></div></div></div>`}).join('');
   if(part==='desk'){
+    const ta=c=>{const ls=Object.values(c.l).sort((a,b)=>b.c-a.c||b.m-a.m).slice(0,12);return 'data-td="450" data-tt="'+esc(c.n+' · '+c.c+' шт. · '+rub(c.m))+'" data-tl="'+esc(ls.length?ls.map(o=>o.n+' — '+o.c+' шт. · '+rub(o.m)).join('|'):'Услуг пока нет')+'"'};
     const R=72,C=2*Math.PI*R,SW=15,GP=6,act=CT.filter(c=>c.m>0);let off=0;
-    const arcs=!act.length?`<circle cx="90" cy="90" r="${R}" fill="none" style="stroke:var(--ln)" stroke-width="${SW}"/>`:act.length===1?`<circle cx="90" cy="90" r="${R}" fill="none" style="stroke:${act[0].col}" stroke-width="${SW}"/>`:act.map(c=>{const f=c.m/t*C,len=Math.max(.01,f-GP-SW),a=`<circle cx="90" cy="90" r="${R}" fill="none" style="stroke:${c.col}" stroke-width="${SW}" stroke-linecap="round" stroke-dasharray="${len} ${C-len}" stroke-dashoffset="${-(off+GP/2+SW/2)}" transform="rotate(-90 90 90)"/>`;off+=f;return a}).join('');
-    const leg=CT.map(c=>`<div class="bsr"><span><i style="background:${c.col}"></i>${c.n}</span><b>${Math.round(c.m/t*100)}%</b></div>`).join('');
+    const arcs=!act.length?`<circle cx="90" cy="90" r="${R}" fill="none" style="stroke:var(--ln)" stroke-width="${SW}"/>`:act.length===1?`<circle cx="90" cy="90" r="${R}" fill="none" style="stroke:${act[0].col}" stroke-width="${SW}" ${ta(act[0])}/>`:act.map(c=>{const f=c.m/t*C,len=Math.max(.01,f-GP-SW),a=`<circle cx="90" cy="90" r="${R}" fill="none" style="stroke:${c.col}" stroke-width="${SW}" stroke-linecap="round" stroke-dasharray="${len} ${C-len}" stroke-dashoffset="${-(off+GP/2+SW/2)}" transform="rotate(-90 90 90)" ${ta(c)}/>`;off+=f;return a}).join('');
+    const leg=CT.map(c=>`<div class="bsr" ${ta(c)}><span><i style="background:${c.col}"></i>${c.n}</span><b>${Math.round(c.m/t*100)}%</b></div>`).join('');
     const ring=`<div class="bt bst"><h4>Структура дохода</h4><div class="bsw"><div class="bsg"><svg viewBox="0 0 180 180" aria-hidden="true">${arcs}</svg><div class="bsc"><small>Доход</small><b>${rub(act.length?tot:0)}</b></div></div><div class="bsl">${leg}</div></div></div>`;
     const svl=CT.flatMap(c=>Object.values(c.l)).filter(o=>o.c>0).sort((a,b)=>b.m/b.c-a.m/a.c).slice(0,4).map(o=>[esc(o.n),rub(Math.round(o.m/o.c))]);
     return [ring,`<div class="bt bls">${body}</div>`,svl];
@@ -2285,7 +2288,7 @@ document.head.appendChild(css);
 /* подсказка у списка внимания: через секунду наведения */
 ;(()=>{let T=0,tip=null,cur=null;const hide=()=>{clearTimeout(T);T=0;cur=null;if(tip){tip.classList.remove('on');const t=tip;setTimeout(()=>{if(t!==tip||!t.classList.contains('on'))t.remove()},180);tip=null}};
 const show=(r,x,y)=>{const tt=r.dataset.tt,l=(r.dataset.tl||'').split('|');const d=document.createElement('div');d.className='btip';d.innerHTML='<b></b>'+l.map(()=>'<div></div>').join('');d.firstChild.textContent=tt;[...d.querySelectorAll('div')].forEach((e,i)=>e.textContent=l[i]);document.body.appendChild(d);const w=d.offsetWidth,h=d.offsetHeight;let L=x+14,Tp=y+16;if(L+w>innerWidth-8)L=x-w-14;if(Tp+h>innerHeight-8)Tp=y-h-12;d.style.left=Math.max(8,L)+'px';d.style.top=Math.max(8,Tp)+'px';requestAnimationFrame(()=>d.classList.add('on'));tip=d};
-let mx=0,my=0;document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;const r=e.target.closest&&e.target.closest('.bex .brw[data-tt],.bhm i[data-tt],.bch rect[data-tt]');if(r!==cur){hide();cur=r;if(r)T=setTimeout(()=>{if(cur===r)show(r,mx,my)},+r.dataset.td||1000)}else if(tip&&r){}},true);
+let mx=0,my=0;document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;const r=e.target.closest&&e.target.closest('.bex .brw[data-tt],.bhm i[data-tt],.bch rect[data-tt],.bsr[data-tt],.bsg circle[data-tt]');if(r!==cur){hide();cur=r;if(r)T=setTimeout(()=>{if(cur===r)show(r,mx,my)},+r.dataset.td||1000)}else if(tip&&r){}},true);
 document.addEventListener('wheel',hide,{capture:true,passive:true});document.addEventListener('mousedown',hide,true)})();
 </script>
 <script type="text/plain" class="boot">
@@ -2717,7 +2720,7 @@ setTimeout(()=>{if(g.offsetParent)load3()},3000);
 /* номер версии для «Дополнительных настроек» */
 
 
-window.__BUILD='20261124.0100';window.__VER='1.0';
+window.__BUILD='20261124.0120';window.__VER='1.0';
 </script>
 </body>
 </html>
