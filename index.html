@@ -527,6 +527,15 @@ input#fOrdP.xi:placeholder-shown,input#ordP.xi:placeholder-shown{padding-right:1
 .dph button:hover,.dpg button:hover{background:color-mix(in srgb,var(--tx) 8%,transparent);cursor:pointer}
 .dpg .sel:hover{background:var(--ac)}
 }
+/* кнопки шапки: ровные квадраты, иконка строго по центру; пункты списка не слипаются */
+@media (min-width:900px){
+.top .nv .ib{width:36px;height:36px;padding:0;border-radius:10px;font-size:0;line-height:0;display:grid;place-items:center}
+.top .nv .ib svg{display:block}
+.vmenu button{margin:0 0 2px}.vmenu button:last-child{margin-bottom:0}
+}
+@media (hover:hover) and (pointer:fine){
+.vmenu button.on:hover{background:color-mix(in srgb,var(--tx) 8%,var(--bg2))}
+}
 </style>
 </head>
 <body>
@@ -619,9 +628,9 @@ SPLASH.start(false);
 <header class="top">
   <button class="ib" id="menuBtn" aria-label="Меню"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
   <div class="ttl"><b id="title"></b><small id="sub"></small></div>
-  <div class="nv" id="zm"><button class="ib" data-z="-1" aria-label="Уменьшить">−</button><button class="ib" data-z="1" aria-label="Увеличить">+</button></div>
+  <div class="nv" id="zm"><button class="ib" data-z="-1" aria-label="Уменьшить"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg></button><button class="ib" data-z="1" aria-label="Увеличить"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5v14"/></svg></button></div>
   <button class="pill" id="todayBtn">Сегодня</button>
-  <div class="nv" id="nv"><button class="ib" data-nav2="-1" aria-label="Назад">‹</button><button class="ib" data-nav2="1" aria-label="Вперёд">›</button></div>
+  <div class="nv" id="nv"><button class="ib" data-nav2="-1" aria-label="Назад"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button class="ib" data-nav2="1" aria-label="Вперёд"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button></div>
   <div class="vw" id="vw">
     <button class="ib" id="vbtn" aria-label="Масштаб календаря"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></button>
     <button type="button" id="fxCord" aria-label="Падающие частицы" style="position:absolute;left:calc(100% + 2px);top:0;width:22px;height:60px;padding:0;background:none;border:0;cursor:pointer;z-index:12;-webkit-tap-highlight-color:transparent;touch-action:manipulation"><svg id="fxCordS" width="22" height="60" viewBox="0 0 22 60" fill="none" aria-hidden="true" style="display:block;pointer-events:none;overflow:visible"><circle id="fxCordA" cx="11" cy="0" r="2.5" fill="var(--tx2)"/><line id="fxCordL" x1="11" y1="0" x2="11" y2="40" stroke="var(--tx2)" stroke-width="1.6" stroke-linecap="round"/><circle id="fxCordB" cx="11" cy="45" r="5" fill="var(--tx2)"/></svg></button>
@@ -2742,7 +2751,7 @@ setTimeout(()=>{if(g.offsetParent)load3()},3000);
 /* номер версии для «Дополнительных настроек» */
 
 
-window.__BUILD='20261124.0905';window.__VER='1.0';
+window.__BUILD='20261124.0925';window.__VER='1.0';
 </script>
 </body>
 </html>
