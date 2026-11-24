@@ -2296,8 +2296,9 @@ document.head.appendChild(css);
 
 /* подсказка у списка внимания: через секунду наведения */
 ;(()=>{let T=0,tip=null,cur=null;const hide=()=>{clearTimeout(T);T=0;cur=null;if(tip){tip.classList.remove('on');const t=tip;setTimeout(()=>{if(t!==tip||!t.classList.contains('on'))t.remove()},180);tip=null}};
-const show=(r,x,y)=>{const tt=r.dataset.tt,l=(r.dataset.tl||'').split('|');const d=document.createElement('div');d.className='btip';d.innerHTML='<b></b>'+l.map(()=>'<div></div>').join('');d.firstChild.textContent=tt;[...d.querySelectorAll('div')].forEach((e,i)=>e.textContent=l[i]);document.body.appendChild(d);const w=d.offsetWidth,h=d.offsetHeight;let L=x+14,Tp=y+16;if(L+w>innerWidth-8)L=x-w-14;if(Tp+h>innerHeight-8)Tp=y-h-12;d.style.left=Math.max(8,L)+'px';d.style.top=Math.max(8,Tp)+'px';requestAnimationFrame(()=>d.classList.add('on'));tip=d};
-let mx=0,my=0;document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;const r=e.target.closest&&e.target.closest('.bex .brw[data-tt],.bhm i[data-tt],.bch rect[data-tt],.bsr[data-tt],.bsg circle[data-tt]');if(r!==cur){hide();cur=r;if(r)T=setTimeout(()=>{if(cur===r)show(r,mx,my)},+r.dataset.td||1000)}else if(tip&&r){}},true);
+const show=(r,x,y)=>{const tt=r.dataset.tt,l=(r.dataset.tl||'').split('|');const d=document.createElement('div');d.className='btip';d.innerHTML='<b></b>'+l.map(()=>'<div></div>').join('');d.firstChild.textContent=tt;[...d.querySelectorAll('div')].forEach((e,i)=>e.textContent=l[i]);document.body.appendChild(d);tip=d;mv(x,y);requestAnimationFrame(()=>d.classList.add('on'))};
+const mv=(x,y)=>{const d=tip;if(!d)return;const w=d.offsetWidth,h=d.offsetHeight;let L=x+14,Tp=y+16;if(L+w>innerWidth-8)L=x-w-14;if(Tp+h>innerHeight-8)Tp=y-h-12;d.style.left=Math.max(8,L)+'px';d.style.top=Math.max(8,Tp)+'px'};
+let mx=0,my=0;document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;const r=e.target.closest&&e.target.closest('.bex .brw[data-tt],.bhm i[data-tt],.bch rect[data-tt],.bsr[data-tt],.bsg circle[data-tt]');if(r!==cur){hide();cur=r;if(r)T=setTimeout(()=>{if(cur===r)show(r,mx,my)},+r.dataset.td||1000)}else if(tip&&r)mv(mx,my)},true);
 document.addEventListener('wheel',hide,{capture:true,passive:true});document.addEventListener('mousedown',hide,true)})();
 </script>
 <script type="text/plain" class="boot">
@@ -2729,7 +2730,7 @@ setTimeout(()=>{if(g.offsetParent)load3()},3000);
 /* номер версии для «Дополнительных настроек» */
 
 
-window.__BUILD='20261124.0150';window.__VER='1.0';
+window.__BUILD='20261124.0850';window.__VER='1.0';
 </script>
 </body>
 </html>
