@@ -2167,7 +2167,7 @@ sheetDrag($('#sheet'),closeAll);
 
 /* PWA: icon, manifest, install */
 (function(){
-  const mk=sz=>{const c=document.createElement('canvas');c.width=c.height=sz;const x=c.getContext('2d');x.fillStyle=/^#[0-9a-f]{6}$/i.test(S.accent||'')?S.accent:'#ffcc00';x.fillRect(0,0,sz,sz);x.fillStyle='#17171a';x.font='bold '+sz*.6+'px Arial';x.textAlign='center';x.textBaseline='middle';x.fillText('♪',sz/2,sz*.54);return c.toDataURL('image/png')};
+  const mk=sz=>{const c=document.createElement('canvas');c.width=c.height=sz;const x=c.getContext('2d');x.fillStyle='#ffffff';x.fillRect(0,0,sz,sz);x.fillStyle=/^#[0-9a-f]{6}$/i.test(S.accent||'')?S.accent:'#ffcc00';x.font='bold '+sz*.72+'px Arial';x.textAlign='center';x.textBaseline='middle';x.fillText('♪',sz/2,sz*.54);return c.toDataURL('image/png')};
   try{
     const i=mk(180),l=document.createElement('link');l.rel='apple-touch-icon';l.href=i;document.head.appendChild(l);
     const m={name:'Студия — календарь',short_name:'Студия',display:'standalone',start_url:location.href,background_color:'#ffffff',theme_color:/^#[0-9a-f]{6}$/i.test(S.accent||'')?S.accent:'#ffcc00',icons:[{src:mk(192),sizes:'192x192',type:'image/png'},{src:mk(512),sizes:'512x512',type:'image/png'}]};
