@@ -1397,7 +1397,7 @@ const smP=P=>{const n=P.length,f=v=>v.toFixed(1);if(n<3)return 'M'+P.map(q=>f(q[
   const first={};d.allk.forEach(x=>{if(!first[x.k]||x.date<first[x.k])first[x.k]=x.date});
   const cur=[...new Set(d.curk.map(x=>x.k))],inP=dt=>an.per==='all'||(an.per==='y'?dt.startsWith(an.y+'-'):dt.startsWith(an.y+'-'+pad(an.m+1)));
   const nw=cur.filter(k=>an.per==='all'||inP(first[k])).length,rt2=cur.length-nw,pc=cur.length&&an.per!=='all'?Math.round(rt2/cur.length*100):null;
-  const cli=`<div class="bt bcl"><div class="bhd"><h4>${d.cliT}</h4>${pc!=null?`<span class="btg">${pc}% ${d.cliR}</span>`:''}</div><div class="bcn"><div><b>${an.per==='all'?cur.length:nw}</b><span class="bs">${an.per==='all'?'всего':'новых'}</span></div>${an.per==='all'?'':`<div><b>${rt2}</b><span class="bs">${d.cliN}</span></div>`}</div><div class="bbar"><i style="width:${pc==null?0:pc}%"></i></div></div>`;
+  const cli=`<div class="bt bcl"><div class="bhd"><h4>${d.cliT}</h4>${pc!=null?`<span class="btg">${pc}% ${d.cliR}</span>`:''}</div><div class="bcn"><div><b>${cur.length}</b><span class="bs">всего</span></div>${an.per==='all'?'':`<div><b>${nw}</b><span class="bs">новых</span></div><div><b>${rt2}</b><span class="bs">${d.cliN}</span></div>`}</div><div class="bbar"><i style="width:${pc==null?0:pc}%"></i></div></div>`;
   /* выводы */
   const wbest=wm.indexOf(Math.max(...wm)),wsum=wm.reduce((a,b)=>a+b,0),wlow=wc.indexOf(Math.min(...wc));
   const i1=d.dp==null?(d.L.length||d.wi.length?`Доход за период — <b>${d.hero.v}</b>.`:'За период пока нет данных.'):`Доход ${d.dp>=0?'вырос':'снизился'} на <b>${Math.abs(d.dp)}%</b> ${d.vs}.`;
