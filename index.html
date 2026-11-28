@@ -688,10 +688,75 @@ const fail=(t,retry)=>{SPLASH.stop();ov.className='';ov.style.opacity='';ov.inne
 const CL=window.CLOUD={me:null,others:{},_prof:{},_evAll:null,_pub:new Map(),_js:null,_pr:'',_n:0,_S:null,_t:0};
 const fb={};
 
+/* ---------- работа без интернета: локальная копия данных ---------- */
+let SNAP=null;
+const SNK='ssl-offline-v1';
+const idb=(mode,fn)=>new Promise((res,rej)=>{try{const r=indexedDB.open('ssl-offline',1);r.onupgradeneeded=()=>r.result.createObjectStore('s');r.onerror=()=>rej(r.error);r.onsuccess=()=>{try{const tx=r.result.transaction('s',mode),q=fn(tx.objectStore('s'));tx.oncomplete=()=>{try{r.result.close()}catch(e){}res(q&&q.result)};tx.onerror=tx.onabort=()=>rej(tx.error)}catch(e){rej(e)}}}catch(e){rej(e)}});
+async function snapGet(){
+  let a=null,b=null;
+  try{const r=localStorage.getItem(SNK);if(r)a=JSON.parse(r)}catch(e){}
+  try{const r=await idb('readonly',st=>st.get(SNK));if(r)b=JSON.parse(r)}catch(e){}
+  const o=!a?b:!b?a:(b.t>a.t?b:a);
+  return o&&o.uid&&o.S&&o.me?o:null;
+}
+function snapPut(o){
+  const t=JSON.stringify(o);
+  try{localStorage.setItem(SNK,t);idb('readwrite',st=>st.delete(SNK)).catch(()=>{});return}catch(e){}
+  idb('readwrite',st=>st.put(t,SNK)).catch(e=>console.warn('Локальная копия:',e));
+}
+function snapClear(){try{localStorage.removeItem(SNK)}catch(e){}idb('readwrite',st=>st.delete(SNK)).catch(()=>{})}
+function snapNow(){
+  try{const S=CL._S||window.__S0;if(!S||!CL.me||!window.__me)return;
+    snapPut({uid:CL.me,root:CL.root,evn:CL.evn,solo:!!CL.solo,me:window.__me,S,others:CL.others,dirty:!!CL._dirty,t:Date.now()})}catch(e){console.warn('Локальная копия:',e)}
+}
+let wired=0;
+function wire(){
+  if(wired)return;wired=1;
+  document.addEventListener('click',e=>{if(e.target.closest('#logout'))logout()});
+  addEventListener('pagehide',()=>{snapNow();if(CL._t)flush()});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden){snapNow();if(CL._t)flush()}});
+}
+const reach=async()=>{try{const c=new AbortController(),t=setTimeout(()=>c.abort(),5000);await fetch('https://www.gstatic.com/generate_204?'+Date.now(),{mode:'no-cors',cache:'no-store',signal:c.signal});clearTimeout(t);return true}catch(e){return false}};
+/* когда интернет вернулся — перезапускаем приложение: оно подтянет облако и отправит всё, что вписано без сети */
+function watchNet(){
+  let last=0;
+  const go=async()=>{
+    if(!CL._off||document.hidden)return;
+    const n=Date.now();if(n-last<15000)return;last=n;
+    if(!(await reach()))return;
+    const a=document.activeElement;
+    if(document.querySelector('#sheet.on,.scrim.on')||(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)))return;
+    let t=0;try{t=+localStorage.getItem('ssl-rl')||0}catch(e){}
+    if(Date.now()-t<120000)return;
+    try{localStorage.setItem('ssl-rl',String(Date.now()))}catch(e){}
+    snapNow();location.reload();
+  };
+  addEventListener('online',go);document.addEventListener('visibilitychange',()=>{if(!document.hidden)go()});setInterval(go,20000);
+}
+async function startOffline(sn){
+  if(CL._go)return;CL._go=1;
+  CL._off=1;CL.me=sn.uid;CL.root=sn.root;CL.evn=sn.evn;CL.solo=!!sn.solo;CL.others=sn.others||{};CL._dirty=!!sn.dirty;CL._S=sn.S;
+  window.__me=sn.me;window.__S0=sn.S;
+  wire();
+  document.querySelectorAll('script.boot').forEach(s=>{const x=document.createElement('script');x.textContent=s.textContent;document.body.appendChild(x)});
+  watchNet();
+  await SPLASH.minWait();await SPLASH.out();
+}
+
 /* ---------- запуск ---------- */
 async function init(){
   if(/ВСТАВЬТЕ/.test(JSON.stringify(FB_CFG)))return fail('Firebase ещё не подключён: вставьте настройки проекта (FB_CFG) в начале файла.',()=>location.reload());
   wait('Загрузка…');
+  try{SNAP=await snapGet()}catch(e){SNAP=null}
+  if(SNAP&&navigator.onLine===false)return startOffline(SNAP);
+  if(!SNAP)return online();
+  /* есть локальная копия: если связь плохая или нет — через 8 секунд открываем приложение из неё */
+  let tm;const lim=new Promise(r=>{tm=setTimeout(()=>r('t'),8000)});
+  const r=await Promise.race([online(true).then(()=>'d',()=>'e'),lim]);
+  clearTimeout(tm);
+  if(r!=='d'){CL._abort=1;return startOffline(SNAP)}
+}
+async function online(strict){
   try{
     if(!fb.auth){
       const [A,F,AU]=await Promise.all([import(CDN+'firebase-app.js'),import(CDN+'firebase-firestore.js'),import(CDN+'firebase-auth.js')]);
@@ -701,9 +766,10 @@ async function init(){
       Object.assign(fb,{F,AU,db,auth});
     }
     await fb.auth.authStateReady();
-  }catch(e){return fail('Нет связи с Firebase. Проверьте интернет. '+emsg(e),init)}
+  }catch(e){if(strict)throw e;return fail('Нет связи с Firebase. Проверьте интернет. Для первого входа на этом устройстве интернет обязателен. '+emsg(e),init)}
+  if(CL._abort)return;
   if(!fb.auth.currentUser)return showAuth();
-  try{await boot(fb.auth.currentUser)}catch(e){console.error(e);fail(emsg(e),init)}
+  try{await boot(fb.auth.currentUser)}catch(e){console.error(e);if(strict)throw e;fail(emsg(e),init)}
 }
 
 /* ---------- экран входа / регистрации ---------- */
@@ -833,21 +899,23 @@ async function boot0(user){
     }catch(e){}
     S0=loc||{};migrated=!!loc;
   }
+  if(CL._abort||CL._go)return;CL._go=1;
   CL.me=uid;CL._n=n;
   CL._pr='';if(prof)CL._pr=JSON.stringify([prof.name,prof.calColor||null,prof.role]);
   if(!migrated){ /* кэш «что уже в облаке» — чтобы писать только изменения */
     CL._pub=new Map((S0.ev||[]).map(e=>[String(e.id),JSON.stringify(pubOf(e))]));
     CL._js=jsOf(S0).js;
   }
+  /* на этом устройстве остались правки, не дошедшие до облака (сделаны без интернета) — они главнее */
+  let lwin=false;
+  if(SNAP&&SNAP.uid===uid&&SNAP.dirty&&!migrated){S0=SNAP.S;lwin=true}
   window.__me={id:uid,email:user.email,name:prof.name,role:prof.role};
   window.__S0=S0;
   if(!isAdm(user)){try{CL._bw=F.onSnapshot(F.doc(db,'blocked',uid),s=>{if(s.exists())blockedScreen(user)},()=>{})}catch(e){}}
   if(!CL.solo)await Promise.race([listen(),sleep(4000)]);
-  document.addEventListener('click',e=>{if(e.target.closest('#logout'))logout()});
-  addEventListener('pagehide',()=>{if(CL._t)flush()});
-  document.addEventListener('visibilitychange',()=>{if(document.hidden&&CL._t)flush()});
+  wire();
   document.querySelectorAll('script.boot').forEach(s=>{const x=document.createElement('script');x.textContent=s.textContent;document.body.appendChild(x)});
-  if(migrated)CL.save(S0,true);
+  if(migrated||lwin)CL.save(S0,true);else{CL._dirty=false;snapNow()}
   await SPLASH.minWait();await SPLASH.out();
 }
 
@@ -858,7 +926,7 @@ function jsOf(S){const evx={};
   const rest={...S};delete rest.ev;rest.evx=evx;return{js:JSON.stringify(rest)}}
 const cut=(s,n)=>{const r=[];let i=0;while(i<s.length){let j=Math.min(i+n,s.length);if(j<s.length){const c=s.charCodeAt(j-1);if(c>=0xD800&&c<0xDC00)j--}r.push(s.slice(i,j));i=j}return r.length?r:['']};
 let busy=false,again=false;
-CL.save=(S,now)=>{CL._S=S;clearTimeout(CL._t);CL._t=now?0:setTimeout(flush,700);if(now)flush()};
+CL.save=(S,now)=>{CL._S=S;CL._v=(CL._v||0)+1;CL._dirty=true;clearTimeout(CL._sn);CL._sn=setTimeout(snapNow,250);clearTimeout(CL._t);CL._t=now?0:setTimeout(flush,700);if(now)flush()};
 async function flush(){
   clearTimeout(CL._t);CL._t=0;
   if(busy){again=true;return}
@@ -867,7 +935,8 @@ async function flush(){
   busy=false;if(again){again=false;flush()}
 }
 async function doFlush(){
-  const S=CL._S;if(!S||!CL.me)return;
+  const S=CL._S;if(!S||!CL.me||CL._off||!fb.db)return;
+  const v0=CL._v;
   const {F,db}=fb,uid=CL.me,D=(...p)=>F.doc(db,CL.root||'users',uid,...p),EVN=CL.evn||'events';
   const pubS=new Map((S.ev||[]).map(e=>[String(e.id),JSON.stringify(pubOf(e))]));
   const {js}=jsOf(S),batches=[];
@@ -895,6 +964,7 @@ async function doFlush(){
   if(c)batches.push(b);
   for(const x of batches)await x.commit();
   CL._js=js;CL._pub=pubS;CL._n=nNew;CL._pr=prSig;
+  if(CL._v===v0){CL._dirty=false;snapNow()}
 }
 
 /* ---------- чужие записи (реальное время) ---------- */
@@ -910,7 +980,7 @@ function rebuild(){
   for(const u in CL._prof){const p=CL._prof[u];
     o[u]={id:u,name:str(p.name,40)||'Без имени',role:p.role==='sound'?'sound':'vocal',calColor:HEX.test(p.calColor||'')?p.calColor:undefined,
       ev:((CL._evAll||{})[u]||[]).map(x=>cleanEv(x.id,x)).filter(Boolean)};}
-  CL.others=o;if(window.__cloudChange)window.__cloudChange();
+  CL.others=o;clearTimeout(CL._so);CL._so=setTimeout(snapNow,2000);if(window.__cloudChange)window.__cloudChange();
   try{CL.adm&&CL.adm.cb&&CL.adm.cb()}catch(e){}
 }
 function listen(){
@@ -923,7 +993,9 @@ function listen(){
 
 /* ---------- выход ---------- */
 async function logout(){
+  if(CL._off||!fb.auth||navigator.onLine===false){try{toast('Для выхода нужен интернет')}catch(e){}return}
   try{clearTimeout(CL._t);await Promise.race([flush().then(()=>fb.F.waitForPendingWrites(fb.db)),sleep(4000)])}catch(e){}
+  if(!CL._dirty)snapClear();
   try{await fb.AU.signOut(fb.auth)}catch(e){}
   location.reload();
 }
@@ -950,6 +1022,7 @@ async function blockedScreen(user){
   CL.me=null;clearTimeout(CL._t);CL._t=0;
   try{if(CL._bw){CL._bw();CL._bw=null}}catch(e){}
   try{if(user)localStorage.removeItem('studio-crm-v1-'+user.uid)}catch(e){}
+  snapClear();
   /* удалённый аккаунт освобождает почту: стираем и запись входа (это можно сделать только с устройства самого человека) */
   try{if(user&&user.delete)await user.delete()}catch(e){}
   try{await fb.AU.signOut(fb.auth)}catch(e){}
@@ -962,7 +1035,7 @@ async function blockedScreen(user){
 /* панель администратора: коды доступа и удаление сотрудников */
 CL.adm={free:'',mode:(()=>{try{return localStorage.getItem('ssl-adm-mode')==='solo'?'solo':'shared'}catch(e){return'shared'}})(),used:{},cb:null,_u:null,_mk:0,
   start(){
-    if(this._u)return;const {F,db}=fb;
+    if(this._u||!fb.db)return;const {F,db}=fb;
     this._u=F.onSnapshot(F.collection(db,'codes'),async s=>{
       let free='';const used={};
       s.forEach(d=>{const x=d.data();if(x.used)used[d.id]={...x,code:d.id};else if(!free){free=d.id;this.mode=x.mode==='solo'?'solo':'shared';try{localStorage.setItem('ssl-adm-mode',this.mode)}catch(e){}}});
@@ -1000,6 +1073,17 @@ CL.adm={free:'',mode:(()=>{try{return localStorage.getItem('ssl-adm-mode')==='so
 };
 
 init();
+/* офлайн-режим: сервис-воркер (файл sw.js рядом с этой страницей) хранит саму программу и модули Firebase */
+try{
+  if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){
+    addEventListener('load',()=>{
+      navigator.serviceWorker.register('sw.js').then(()=>navigator.serviceWorker.ready).then(r=>{
+        if(r.active)r.active.postMessage({warm:location.href,mods:['firebase-app.js','firebase-firestore.js','firebase-auth.js'].map(x=>CDN+x)});
+      }).catch(e=>console.warn('sw',e));
+    });
+  }
+  if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
+}catch(e){}
 })();
 </script>
 <script type="text/plain" class="boot">
