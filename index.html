@@ -1149,17 +1149,14 @@ function rpList(){
   const td=iso(new Date()),by=new Map(),res=[],dn=(a,b)=>Math.round((pd(b)-pd(a))/864e5);
   S.ev.forEach(e=>{if(e.type!=='lesson'||e.hh||!e.person||!e.date)return;const k=key(e.person);if(!k)return;if(!by.has(k))by.set(k,[]);by.get(k).push(e)});
   by.forEach((L,k)=>{
-    const P=L.filter(e=>e.date<=td).sort((a,b)=>a.date.localeCompare(b.date)||a.start-b.start);
+    const P=L.slice().sort((a,b)=>a.date.localeCompare(b.date)||a.start-b.start);
     if(P.length<RP_N)return;
     const T=P.slice(-RP_N),last=T[T.length-1],g=dn(T[T.length-2].date,last.date);
     if(g!==7&&g!==14)return;
     for(let i=T.length-1;i>0;i--)if(dn(T[i-1].date,T[i].date)!==g||T[i-1].start!==T[i].start)return;
     const lt=dn(last.date,td);if(lt>2*g)return;
     if((S.cx||[]).some(c=>c.k===k&&c.date>last.date&&c.date<=td))return;
-    let cur=last.date;
-    for(let i=0;i<60;i++){const nx=iso(addD(pd(cur),g));if(L.some(e=>e.date===nx&&e.start===last.start))cur=nx;else break}
-    if(L.some(e=>e.date>cur))return;
-    const date=cur===last.date?iso(addD(pd(last.date),Math.max(1,Math.ceil(lt/g))*g)):iso(addD(pd(cur),g));
+    const date=lt<0?iso(addD(pd(last.date),g)):iso(addD(pd(last.date),Math.max(1,Math.ceil(lt/g))*g));
     if(dn(td,date)>70)return;
     res.push({k,nm:String(last.person).trim(),g,t:last,date});
   });
